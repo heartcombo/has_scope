@@ -1,0 +1,51 @@
+== HasScope
+
+Has scope allows you to easily create controller filters based on your resources named scopes.
+Imagine the following model called graduations:
+
+  class Graduation < ActiveRecord::Base
+    named_scope :featured, :conditions => { :featured => true }
+    named_scope :by_degree, proc {|degree| { :conditions => { :degree => degree } } }
+  end
+
+You can use those named scopes as filters by declaring them on your controller:
+
+  class GraduationsController < ApplicationController
+    has_scope :featured, :boolean => true
+    has_scope :by_degree
+  end
+
+Now, if you want to apply them to an specific resource, you just need to call <tt>apply_scopes</tt>:
+
+  class GraduationsController < ApplicationController
+  	has_scope :featured, :boolean => true
+  	has_scope :by_degree
+
+	def index
+	  @graduations = apply_scopes(Graduations).all
+	end
+  end
+
+Then for each request:
+
+  /graduations
+  #=> acts like a normal request
+
+  /graduations?featured=true
+  #=> calls the named scope and bring featured graduations
+
+  /graduations?featured=true&by_degree=phd
+  #=> brings featured graduations with phd degree
+
+You can retrieve all the scopes applied in one action with <tt>current_scopes</tt> method.
+In the last case, it would return: { :featured => true, :by_degree => "phd" }.
+
+Please check <tt>has_scope</tt> method for all the supported options.
+
+== Bugs and Feedback
+
+If you discover any bugs or want to drop a line, feel free to create an issue on GitHub.
+
+http://github.com/plataformatec/has_scope/issues
+
+MIT License. Copyright 2009 Plataforma Tecnologia. http://blog.plataformatec.com.br

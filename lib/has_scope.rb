@@ -1,6 +1,6 @@
 module HasScope
   TRUE_VALUES = ["true", true, "1", 1]
-  
+
   def self.included(base)
     base.class_eval do
       extend ClassMethods
@@ -13,34 +13,6 @@ module HasScope
 
   module ClassMethods
     # Detects params from url and apply as scopes to your classes.
-    #
-    # Your model:
-    #
-    #   class Graduation < ActiveRecord::Base
-    #     named_scope :featured, :conditions => { :featured => true }
-    #     named_scope :by_degree, proc {|degree| { :conditions => { :degree => degree } } }
-    #   end
-    #
-    # Your controller:
-    #
-    #   class GraduationsController < InheritedResources::Base
-    #     has_scope :featured, :boolean => true, :only => :index
-    #     has_scope :by_degree, :only => :index
-    #   end
-    #
-    # Then for each request:
-    #
-    #   /graduations
-    #   #=> acts like a normal request
-    #
-    #   /graduations?featured=true
-    #   #=> calls the named scope and bring featured graduations
-    #
-    #   /graduations?featured=true&by_degree=phd
-    #   #=> brings featured graduations with phd degree
-    #
-    # You can retrieve the current scopes in use with <tt>current_scopes</tt>
-    # method. In the last case, it would return: { :featured => "true", :by_degree => "phd" }
     #
     # == Options
     #
