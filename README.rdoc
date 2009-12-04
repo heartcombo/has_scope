@@ -18,12 +18,12 @@ You can use those named scopes as filters by declaring them on your controller:
 Now, if you want to apply them to an specific resource, you just need to call <tt>apply_scopes</tt>:
 
   class GraduationsController < ApplicationController
-  	has_scope :featured, :boolean => true
-  	has_scope :by_degree
+    has_scope :featured, :boolean => true
+    has_scope :by_degree
 
-	def index
-	  @graduations = apply_scopes(Graduations).all
-	end
+    def index
+      @graduations = apply_scopes(Graduations).all
+    end
   end
 
 Then for each request:
