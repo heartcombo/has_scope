@@ -1,6 +1,12 @@
 module HasScope
   TRUE_VALUES = ["true", true, "1", 1]
 
+  ALLOWED_TYPES = {
+    :array   => [ Array ],
+    :hash    => [ Hash ],
+    :default => [ String, Numeric ]
+  }
+
   def self.included(base)
     base.class_eval do
       extend ClassMethods
@@ -16,8 +22,10 @@ module HasScope
     #
     # == Options
     #
-    # * <tt>:boolean</tt> - When set to true, call the scope only when the param is true or 1,
-    #                       and does not send the value as argument.
+    # * <tt>:type</tt> - Checks the type of the parameter sent. If set to :boolean
+    #                    it just calls the named scope, without any argument. By default,
+    #                    it does not allow hashes or arrays to be given, except if type
+    #                    :hash or :array are set.
     #
     # * <tt>:only</tt> - In which actions the scope is applied. By default is :all.
     #
@@ -33,22 +41,24 @@ module HasScope
     #                      if the scope should NOT apply.
     #
     # * <tt>:default</tt> - Default value for the scope. Whenever supplied the scope
-    #                       is always called. This is useful to add easy pagination.
+    #                       is always called.
     #
     def has_scope(*scopes)
       options = scopes.extract_options!
       options.symbolize_keys!
-      options.assert_valid_keys(:boolean, :only, :except, :if, :unless, :default, :as)
+
+      if options.delete(:boolean)
+        options[:type] ||= :boolean
+        ActiveSupport::Deprecation.warn(":boolean => true is deprecated, use :type => :boolean instead", caller)
+      end
+      options.assert_valid_keys(:type, :only, :except, :if, :unless, :default, :as)
+
+      options[:only]   = Array(options[:only])
+      options[:except] = Array(options[:except])
 
       scopes.each do |scope|
-        self.scopes_configuration[scope]         ||= {}
-        self.scopes_configuration[scope][:as]      = options[:as] || scope
-        self.scopes_configuration[scope][:only]    = Array(options[:only])
-        self.scopes_configuration[scope][:except]  = Array(options[:except])
-
-        [:if, :unless, :boolean, :default].each do |opt|
-          self.scopes_configuration[scope][opt] = options[opt] if options.key?(opt)
-        end
+        self.scopes_configuration[scope] ||= { :as => scope, :type => :default }
+        self.scopes_configuration[scope].merge!(options)
       end
     end
   end
@@ -66,7 +76,7 @@ module HasScope
   #     end
   #   end
   #
-  def apply_scopes(target_object)
+  def apply_scopes(target)
     self.scopes_configuration.each do |scope, options|
       next unless apply_scope_to_action?(options)
       key = options[:as]
@@ -78,17 +88,23 @@ module HasScope
         value = value.call(self) if value.is_a?(Proc)
       end
 
-      if call_scope
-        if options[:boolean]
-          target_object = target_object.send(scope) if current_scopes[key] = TRUE_VALUES.include?(value)
-        else
-          current_scopes[key] = value
-          target_object = target_object.send(scope, value)
-        end
-      end
+      target = apply_scope_by_type(options[:type], key, scope, value, target) if call_scope
     end
 
-    target_object
+    target
+  end
+
+  # Apply the scope taking into account its type.
+  def apply_scope_by_type(type, key, scope, value, target) #:nodoc:
+    if type == :boolean
+      current_scopes[key] = TRUE_VALUES.include?(value)
+      current_scopes[key] ? target.send(scope) : target
+    elsif ALLOWED_TYPES[type].none?{ |klass| value.is_a?(klass) }
+      raise "Expected type :#{type} in params[:#{key}], got :#{value.class}"
+    else
+      current_scopes[key] = value
+      target.send(scope, value)
+    end
   end
 
   # Given an options with :only and :except arrays, check if the scope

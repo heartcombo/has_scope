@@ -5,10 +5,12 @@ end
 
 class TreesController < ApplicationController
   has_scope :color, :unless => :show_all_colors?
-  has_scope :only_tall, :boolean => true, :only => :index, :if => :restrict_to_only_tall_trees?
+  has_scope :only_tall, :type => :boolean, :only => :index, :if => :restrict_to_only_tall_trees?
   has_scope :shadown_range, :default => 10, :except => [ :index, :show, :destroy, :new ]
   has_scope :root_type, :as => :root
   has_scope :calculate_height, :default => proc {|c| c.session[:height] || 20 }, :only => :new
+  has_scope :paginate, :type => :hash
+  has_scope :categories, :type => :array
 
   def index
     @trees = apply_scopes(Tree).all
@@ -105,6 +107,36 @@ class HasScopeTest < ActionController::TestCase
     get :index, :color => 'blue', :only_tall => 'true'
     assert_equal([mock_tree], assigns(:trees))
     assert_equal({ :color => 'blue', :only_tall => true }, current_scopes)
+  end
+
+  def test_scope_of_type_hash
+    hash = { "page" => "1", "per_page" => "1" }
+    Tree.expects(:paginate).with(hash).returns(Tree)
+    Tree.expects(:all).returns([mock_tree])
+    get :index, :paginate => hash
+    assert_equal([mock_tree], assigns(:trees))
+    assert_equal({ :paginate => hash }, current_scopes)
+  end
+
+  def test_scope_of_type_array
+    array = %w(book kitchen sport)
+    Tree.expects(:categories).with(array).returns(Tree)
+    Tree.expects(:all).returns([mock_tree])
+    get :index, :categories => array
+    assert_equal([mock_tree], assigns(:trees))
+    assert_equal({ :categories => array }, current_scopes)
+  end
+
+  def test_invalid_type_hash_for_default_type_scope
+    assert_raise RuntimeError do
+      get :index, :color => { :blue => :red }
+    end
+  end
+
+  def test_invalid_type_string_for_hash_type_scope
+    assert_raise RuntimeError do
+      get :index, :paginate => "1"
+    end
   end
 
   def test_scope_is_called_with_default_value
