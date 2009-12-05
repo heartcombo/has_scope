@@ -40,7 +40,8 @@ Then for each request:
 You can retrieve all the scopes applied in one action with <tt>current_scopes</tt> method.
 In the last case, it would return: { :featured => true, :by_degree => "phd" }.
 
-Please check <tt>has_scope</tt> method for all the supported options.
+<tt>has_scope</tt> support several options (:only, :except, :as, :if, :unless, :default
+and :type), please check the documentation for a detailed description.
 
 == Bugs and Feedback
 
