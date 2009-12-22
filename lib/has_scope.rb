@@ -12,7 +12,7 @@ module HasScope
       extend ClassMethods
       helper_method :current_scopes
 
-      class_inheritable_accessor :scopes_configuration, :instance_writer => false
+      class_inheritable_hash :scopes_configuration, :instance_writer => false
       self.scopes_configuration ||= {}
     end
   end
