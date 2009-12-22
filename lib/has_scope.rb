@@ -169,4 +169,4 @@ module HasScope
   end
 end
 
-ApplicationController.send :include, HasScope
+ActionController::Base.send :include, HasScope
