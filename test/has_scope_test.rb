@@ -6,11 +6,19 @@ end
 class TreesController < ApplicationController
   has_scope :color, :unless => :show_all_colors?
   has_scope :only_tall, :type => :boolean, :only => :index, :if => :restrict_to_only_tall_trees?
-  has_scope :shadown_range, :default => 10, :except => [ :index, :show, :destroy, :new ]
-  has_scope :root_type, :as => :root
+  has_scope :shadown_range, :default => 10, :except => [ :index, :show, :new ]
+  has_scope :root_type, :as => :root, :allow_blank => true
   has_scope :calculate_height, :default => proc {|c| c.session[:height] || 20 }, :only => :new
   has_scope :paginate, :type => :hash
   has_scope :categories, :type => :array
+
+  has_scope :only_short, :type => :boolean do |controller, scope|
+    scope.only_really_short!(controller.object_id)
+  end
+
+  has_scope :by_category do |controller, scope, value|
+    scope.by_given_category(controller.object_id, value + "_id")
+  end
 
   def index
     @trees = apply_scopes(Tree).all
@@ -50,7 +58,7 @@ class HasScopeTest < ActionController::TestCase
     assert_equal({ :only_tall => true }, current_scopes)
   end
 
-  def test_boolean_scope_is_called_when_boolean_param_is_false
+  def test_boolean_scope_is_not_called_when_boolean_param_is_false
     Tree.expects(:only_tall).never
     Tree.expects(:all).returns([mock_tree])
     get :index, :only_tall => 'false'
@@ -98,6 +106,22 @@ class HasScopeTest < ActionController::TestCase
     get :index, :color => 'blue'
     assert_equal([mock_tree], assigns(:trees))
     assert_equal({ :color => 'blue' }, current_scopes)
+  end
+
+  def test_scope_is_not_called_if_blank
+    Tree.expects(:color).never
+    Tree.expects(:all).returns([mock_tree]).in_sequence
+    get :index, :color => ''
+    assert_equal([mock_tree], assigns(:trees))
+    assert_equal({ }, current_scopes)
+  end
+
+  def test_scope_is_called_when_blank_if_allow_blank_is_given
+    Tree.expects(:root_type).with('').returns(Tree)
+    Tree.expects(:all).returns([mock_tree]).in_sequence
+    get :index, :root => ''
+    assert_equal([mock_tree], assigns(:trees))
+    assert_equal({ :root => '' }, current_scopes)
   end
 
   def test_multiple_scopes_are_called
@@ -170,6 +194,22 @@ class HasScopeTest < ActionController::TestCase
     get :new
     assert_equal(mock_tree, assigns(:tree))
     assert_equal({ :calculate_height => 100 }, current_scopes)
+   end
+
+   def test_scope_with_boolean_block
+     Tree.expects(:only_really_short!).with(@controller.object_id).returns(Tree)
+     Tree.expects(:all).returns([mock_tree])
+     get :index, :only_short => 'true'
+     assert_equal([mock_tree], assigns(:trees))
+     assert_equal({ :only_short => true }, current_scopes)
+   end
+
+   def test_scope_with_other_block_types
+     Tree.expects(:by_given_category).with(@controller.object_id, 'for_id').returns(Tree)
+     Tree.expects(:all).returns([mock_tree])
+     get :index, :by_category => 'for'
+     assert_equal([mock_tree], assigns(:trees))
+     assert_equal({ :by_category => 'for' }, current_scopes)
    end
 
   protected

@@ -4,6 +4,7 @@ module HasScope
   ALLOWED_TYPES = {
     :array   => [ Array ],
     :hash    => [ Hash ],
+    :boolean => [ Object ],
     :default => [ String, Numeric ]
   }
 
@@ -43,7 +44,23 @@ module HasScope
     # * <tt>:default</tt> - Default value for the scope. Whenever supplied the scope
     #                       is always called.
     #
-    def has_scope(*scopes)
+    # * <tt>:allow_blank</tt> - Blank values are not sent to scopes by default. Set to true to overwrite.
+    #
+    # == Block usage
+    #
+    # has_scope also accepts a block. The controller, current scope and value are yielded
+    # to the block so the user can apply the scope on its own. This is useful in case we
+    # need to manipulate the given value:
+    #
+    #   has_scope :category do |controller, scope, value|
+    #     value != "all" ? scope.by_category(value) : scope
+    #   end
+    #
+    #   has_scope :not_voted_by_me, :type => :boolean do |controller, scope|
+    #     scope.not_voted_by(controller.current_user.id) 
+    #   end
+    #
+    def has_scope(*scopes, &block)
       options = scopes.extract_options!
       options.symbolize_keys!
 
@@ -51,13 +68,13 @@ module HasScope
         options[:type] ||= :boolean
         ActiveSupport::Deprecation.warn(":boolean => true is deprecated, use :type => :boolean instead", caller)
       end
-      options.assert_valid_keys(:type, :only, :except, :if, :unless, :default, :as)
+      options.assert_valid_keys(:type, :only, :except, :if, :unless, :default, :as, :allow_blank)
 
       options[:only]   = Array(options[:only])
       options[:except] = Array(options[:except])
 
       scopes.each do |scope|
-        self.scopes_configuration[scope] ||= { :as => scope, :type => :default }
+        self.scopes_configuration[scope] ||= { :as => scope, :type => :default, :block => block }
         self.scopes_configuration[scope].merge!(options)
       end
     end
@@ -88,22 +105,34 @@ module HasScope
         value = value.call(self) if value.is_a?(Proc)
       end
 
-      target = apply_scope_by_type(options[:type], key, scope, value, target) if call_scope
+      if call_scope && (value.present? || options[:allow_blank])
+        set_current_scope(options[:type], key, value)
+        target = apply_scope_by_type(options[:type], scope, target, current_scopes[key], options[:block])
+      end
     end
 
     target
   end
 
-  # Apply the scope taking into account its type.
-  def apply_scope_by_type(type, key, scope, value, target) #:nodoc:
+  # Set the real value for the current scope if type check.
+  def set_current_scope(type, key, value) #:nodoc:
     if type == :boolean
       current_scopes[key] = TRUE_VALUES.include?(value)
-      current_scopes[key] ? target.send(scope) : target
     elsif ALLOWED_TYPES[type].none?{ |klass| value.is_a?(klass) }
       raise "Expected type :#{type} in params[:#{key}], got :#{value.class}"
     else
       current_scopes[key] = value
-      target.send(scope, value)
+    end
+  end
+
+  # Apply the scope taking into account its type.
+  def apply_scope_by_type(type, scope, target, value, block) #:nodoc:
+    return target if type == :boolean && value == false
+
+    if type == :boolean
+      block ? block.call(self, target) : target.send(scope)
+    else
+      block ? block.call(self, target, value) : target.send(scope, value)
     end
   end
 
