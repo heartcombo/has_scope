@@ -22,7 +22,7 @@ Now, if you want to apply them to an specific resource, you just need to call <t
     has_scope :by_degree
 
     def index
-      @graduations = apply_scopes(Graduations).all
+      @graduations = apply_scopes(Graduation).all
     end
   end
 
