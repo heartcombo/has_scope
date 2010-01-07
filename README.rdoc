@@ -54,26 +54,19 @@ If you want it as plugin, just do:
 
 HasScope supports several options:
 
-* <tt>:type</tt> - Checks the type of the parameter sent. If set to :boolean
-                   it just calls the named scope, without any argument. By default,
-                   it does not allow hashes or arrays to be given, except if type
-                   :hash or :array are set.
+* <tt>:type</tt> - Checks the type of the parameter sent. If set to :boolean it just calls the named scope, without any argument. By default, it does not allow hashes or arrays to be given, except if type :hash or :array are set.
 
 * <tt>:only</tt> - In which actions the scope is applied.
 
 * <tt>:except</tt> - In which actions the scope is not applied.
 
-* <tt>:as</tt> - The key in the params hash expected to find the scope.
-                 Defaults to the scope name.
+* <tt>:as</tt> - The key in the params hash expected to find the scope. Defaults to the scope name.
 
-* <tt>:if</tt> - Specifies a method, proc or string to call to determine
-                 if the scope should apply
+* <tt>:if</tt> - Specifies a method, proc or string to call to determine if the scope should apply.
 
-* <tt>:unless</tt> - Specifies a method, proc or string to call to determine
-                     if the scope should NOT apply.
+* <tt>:unless</tt> - Specifies a method, proc or string to call to determine if the scope should NOT apply.
 
-* <tt>:default</tt> - Default value for the scope. Whenever supplied the scope
-                      is always called.
+* <tt>:default</tt> - Default value for the scope. Whenever supplied the scope is always called.
 
 * <tt>:allow_blank</tt> - Blank values are not sent to scopes by default. Set to true to overwrite.
 
