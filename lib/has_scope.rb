@@ -14,7 +14,6 @@ module HasScope
       helper_method :current_scopes
 
       class_inheritable_hash :scopes_configuration, :instance_writer => false
-      self.scopes_configuration ||= {}
     end
   end
 
@@ -64,14 +63,11 @@ module HasScope
       options = scopes.extract_options!
       options.symbolize_keys!
 
-      if options.delete(:boolean)
-        options[:type] ||= :boolean
-        ActiveSupport::Deprecation.warn(":boolean => true is deprecated, use :type => :boolean instead", caller)
-      end
       options.assert_valid_keys(:type, :only, :except, :if, :unless, :default, :as, :allow_blank)
 
       options[:only]   = Array(options[:only])
       options[:except] = Array(options[:except])
+      self.scopes_configuration ||= {}
 
       scopes.each do |scope|
         self.scopes_configuration[scope] ||= { :as => scope, :type => :default, :block => block }
@@ -119,7 +115,7 @@ module HasScope
     if type == :boolean
       current_scopes[key] = TRUE_VALUES.include?(value)
     elsif ALLOWED_TYPES[type].none?{ |klass| value.is_a?(klass) }
-      raise "Expected type :#{type} in params[:#{key}], got :#{value.class}"
+      raise "Expected type :#{type} in params[:#{key}], got #{value.class}"
     else
       current_scopes[key] = value
     end
@@ -127,10 +123,12 @@ module HasScope
 
   # Apply the scope taking into account its type.
   def apply_scope_by_type(type, scope, target, value, block) #:nodoc:
-    return target if type == :boolean && value == false
-
     if type == :boolean
-      block ? block.call(self, target) : target.send(scope)
+      if value
+        block ? block.call(self, target) : target.send(scope)
+      else
+        target
+      end
     else
       block ? block.call(self, target, value) : target.send(scope, value)
     end
