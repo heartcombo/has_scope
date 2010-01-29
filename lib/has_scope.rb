@@ -12,7 +12,6 @@ module HasScope
     base.class_eval do
       extend ClassMethods
       helper_method :current_scopes
-
       class_inheritable_hash :scopes_configuration, :instance_writer => false
     end
   end
@@ -62,11 +61,11 @@ module HasScope
     def has_scope(*scopes, &block)
       options = scopes.extract_options!
       options.symbolize_keys!
-
       options.assert_valid_keys(:type, :only, :except, :if, :unless, :default, :as, :allow_blank)
 
       options[:only]   = Array(options[:only])
       options[:except] = Array(options[:except])
+
       self.scopes_configuration ||= {}
 
       scopes.each do |scope|
@@ -90,6 +89,8 @@ module HasScope
   #   end
   #
   def apply_scopes(target)
+    return unless scopes_configuration
+
     self.scopes_configuration.each do |scope, options|
       next unless apply_scope_to_action?(options)
       key = options[:as]
