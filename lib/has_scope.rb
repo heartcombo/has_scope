@@ -89,7 +89,7 @@ module HasScope
   #   end
   #
   def apply_scopes(target)
-    return unless scopes_configuration
+    return target unless scopes_configuration
 
     self.scopes_configuration.each do |scope, options|
       next unless apply_scope_to_action?(options)
