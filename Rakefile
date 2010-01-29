@@ -27,7 +27,7 @@ begin
   require 'jeweler'
   Jeweler::Tasks.new do |s|
     s.name = "has_scope"
-    s.version = "0.4"
+    s.version = "0.4.1"
     s.summary = "Maps controller filters to your resource scopes"
     s.email = "contact@plataformatec.com.br"
     s.homepage = "http://github.com/plataformatec/has_scope"
