@@ -19,8 +19,7 @@ RAILS_ROOT = "anywhere"
 
 require 'active_support'
 require 'action_controller'
-require 'action_controller/test_case'
-require 'action_controller/test_process'
+require 'action_dispatch/middleware/flash'
 
 class ApplicationController < ActionController::Base; end
 
