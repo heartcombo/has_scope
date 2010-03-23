@@ -33,6 +33,9 @@ module HasScope
     # * <tt>:as</tt> - The key in the params hash expected to find the scope.
     #                  Defaults to the scope name.
     #
+    # * <tt>:using</tt> - If type is a hash, you can provide :using to convert the hash to
+    #                     a named scope call with several arguments.
+    #
     # * <tt>:if</tt> - Specifies a method, proc or string to call to determine
     #                  if the scope should apply
     #
@@ -61,7 +64,17 @@ module HasScope
     def has_scope(*scopes, &block)
       options = scopes.extract_options!
       options.symbolize_keys!
-      options.assert_valid_keys(:type, :only, :except, :if, :unless, :default, :as, :allow_blank)
+      options.assert_valid_keys(:type, :only, :except, :if, :unless, :default, :as, :using, :allow_blank)
+
+      if options.key?(:using)
+        if options.key?(:type) && options[:type] != :hash
+          raise "You cannot use :using with another :type different than :hash"
+        else
+          options[:type] = :hash
+        end
+
+        options[:using] = Array(options[:using])
+      end
 
       options[:only]   = Array(options[:only])
       options[:except] = Array(options[:except])
@@ -80,7 +93,7 @@ module HasScope
   # Receives an object where scopes will be applied to.
   #
   #   class GraduationsController < InheritedResources::Base
-  #     has_scope :featured, :boolean => true, :only => :index
+  #     has_scope :featured, :type => true, :only => :index
   #     has_scope :by_degree, :only => :index
   #
   #     def index
@@ -88,23 +101,25 @@ module HasScope
   #     end
   #   end
   #
-  def apply_scopes(target)
+  def apply_scopes(target, hash=params)
     return target unless scopes_configuration
 
     self.scopes_configuration.each do |scope, options|
       next unless apply_scope_to_action?(options)
       key = options[:as]
 
-      if params.key?(key)
-        value, call_scope = params[key], true
+      if hash.key?(key)
+        value, call_scope = hash[key], true
       elsif options.key?(:default)
         value, call_scope = options[:default], true
         value = value.call(self) if value.is_a?(Proc)
       end
 
+      value = parse_value(options[:type], key, value)
+
       if call_scope && (value.present? || options[:allow_blank])
-        set_current_scope(options[:type], key, value)
-        target = apply_scope_by_type(options[:type], scope, target, current_scopes[key], options[:block])
+        current_scopes[key] = value
+        target = call_scope_by_type(options[:type], scope, target, value, options)
       end
     end
 
@@ -112,24 +127,25 @@ module HasScope
   end
 
   # Set the real value for the current scope if type check.
-  def set_current_scope(type, key, value) #:nodoc:
+  def parse_value(type, key, value) #:nodoc:
     if type == :boolean
-      current_scopes[key] = TRUE_VALUES.include?(value)
-    elsif ALLOWED_TYPES[type].none?{ |klass| value.is_a?(klass) }
+      TRUE_VALUES.include?(value)
+    elsif value && ALLOWED_TYPES[type].none?{ |klass| value.is_a?(klass) }
       raise "Expected type :#{type} in params[:#{key}], got #{value.class}"
     else
-      current_scopes[key] = value
+      value
     end
   end
 
-  # Apply the scope taking into account its type.
-  def apply_scope_by_type(type, scope, target, value, block) #:nodoc:
+  # Call the scope taking into account its type.
+  def call_scope_by_type(type, scope, target, value, options) #:nodoc:
+    block = options[:block]
+
     if type == :boolean
-      if value
-        block ? block.call(self, target) : target.send(scope)
-      else
-        target
-      end
+      block ? block.call(self, target) : target.send(scope)
+    elsif value && options.key?(:using)
+      value = value.values_at(*options[:using])
+      block ? block.call(self, target, value) : target.send(scope, *value)
     else
       block ? block.call(self, target, value) : target.send(scope, value)
     end

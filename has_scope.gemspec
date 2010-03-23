@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{has_scope}
-  s.version = "0.4.2"
+  s.version = "0.5.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Jos\303\251 Valim"]
-  s.date = %q{2010-02-19}
+  s.date = %q{2010-03-23}
   s.description = %q{Maps controller filters to your resource scopes}
   s.email = %q{contact@plataformatec.com.br}
   s.extra_rdoc_files = [
@@ -25,7 +25,7 @@ Gem::Specification.new do |s|
   s.homepage = %q{http://github.com/plataformatec/has_scope}
   s.rdoc_options = ["--charset=UTF-8"]
   s.require_paths = ["lib"]
-  s.rubygems_version = %q{1.3.5}
+  s.rubygems_version = %q{1.3.6}
   s.summary = %q{Maps controller filters to your resource scopes}
   s.test_files = [
     "test/has_scope_test.rb",

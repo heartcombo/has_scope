@@ -26,6 +26,14 @@ class ApplicationController < ActionController::Base; end
 $:.unshift File.expand_path(File.dirname(__FILE__) + '/../lib')
 require 'has_scope'
 
-ActionController::Routing::Routes.draw do |map|
+HasScope::Router = ActionDispatch::Routing::RouteSet.new
+HasScope::Router.draw do |map|
   map.connect ':controller/:action/:id'
+  map.connect ':controller/:action'
+end
+
+class ActiveSupport::TestCase
+  setup do
+    @router = HasScope::Router
+  end
 end

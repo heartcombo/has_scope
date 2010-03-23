@@ -10,6 +10,7 @@ class TreesController < ApplicationController
   has_scope :root_type, :as => :root, :allow_blank => true
   has_scope :calculate_height, :default => proc {|c| c.session[:height] || 20 }, :only => :new
   has_scope :paginate, :type => :hash
+  has_scope :args_paginate, :type => :hash, :using => [:page, :per_page]
   has_scope :categories, :type => :array
 
   has_scope :only_short, :type => :boolean do |controller, scope|
@@ -63,7 +64,7 @@ class HasScopeTest < ActionController::TestCase
     Tree.expects(:all).returns([mock_tree])
     get :index, :only_tall => 'false'
     assert_equal([mock_tree], assigns(:trees))
-    assert_equal({ :only_tall => false }, current_scopes)
+    assert_equal({}, current_scopes)
   end
 
   def test_scope_is_called_only_on_index
@@ -134,12 +135,21 @@ class HasScopeTest < ActionController::TestCase
   end
 
   def test_scope_of_type_hash
-    hash = { "page" => "1", "per_page" => "1" }
+    hash = { "page" => "1", "per_page" => "10" }
     Tree.expects(:paginate).with(hash).returns(Tree)
     Tree.expects(:all).returns([mock_tree])
     get :index, :paginate => hash
     assert_equal([mock_tree], assigns(:trees))
     assert_equal({ :paginate => hash }, current_scopes)
+  end
+
+  def test_scope_of_type_hash_with_using
+    hash = { "page" => "1", "per_page" => "10" }
+    Tree.expects(:args_paginate).with("1", "10").returns(Tree)
+    Tree.expects(:all).returns([mock_tree])
+    get :index, :args_paginate => hash
+    assert_equal([mock_tree], assigns(:trees))
+    assert_equal({ :args_paginate => hash }, current_scopes)
   end
 
   def test_scope_of_type_array

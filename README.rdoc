@@ -20,6 +20,7 @@ Now, if you want to apply them to an specific resource, you just need to call <t
   class GraduationsController < ApplicationController
     has_scope :featured, :type => :boolean
     has_scope :by_degree
+    has_scope :by_period, :using => [:started_at, :ended_at]
 
     def index
       @graduations = apply_scopes(Graduation).all
@@ -36,6 +37,9 @@ Then for each request:
 
   /graduations?featured=true&by_degree=phd
   #=> brings featured graduations with phd degree
+
+  /graduations?params[by_period][started_at]=20100701&params[by_period][ended_at]=20101013
+  #=> brings graduations in the given period
 
 You can retrieve all the scopes applied in one action with <tt>current_scopes</tt> method.
 In the last case, it would return: { :featured => true, :by_degree => "phd" }.
@@ -61,6 +65,8 @@ HasScope supports several options:
 * <tt>:except</tt> - In which actions the scope is not applied.
 
 * <tt>:as</tt> - The key in the params hash expected to find the scope. Defaults to the scope name.
+
+* <tt>:using</tt> - The subkeys to be used as args when type is a hash.
 
 * <tt>:if</tt> - Specifies a method, proc or string to call to determine if the scope should apply.
 
