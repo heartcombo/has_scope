@@ -1,5 +1,8 @@
 require 'rubygems'
 
+gem 'activesupport', '3.0.0.beta2'
+gem 'actionpack', '3.0.0.beta2'
+
 begin
   gem "test-unit"
 rescue LoadError
@@ -26,14 +29,14 @@ class ApplicationController < ActionController::Base; end
 $:.unshift File.expand_path(File.dirname(__FILE__) + '/../lib')
 require 'has_scope'
 
-HasScope::Router = ActionDispatch::Routing::RouteSet.new
-HasScope::Router.draw do |map|
+HasScope::Routes = ActionDispatch::Routing::RouteSet.new
+HasScope::Routes.draw do |map|
   map.connect ':controller/:action/:id'
   map.connect ':controller/:action'
 end
 
 class ActiveSupport::TestCase
   setup do
-    @router = HasScope::Router
+    @routes = HasScope::Routes
   end
 end
