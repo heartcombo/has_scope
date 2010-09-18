@@ -26,6 +26,6 @@ end
 
 class ActiveSupport::TestCase
   setup do
-    @routes ||= HasScope::Routes
+    @routes = HasScope::Routes
   end
 end
