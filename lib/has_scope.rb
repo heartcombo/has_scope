@@ -58,7 +58,7 @@ module HasScope
     #   end
     #
     #   has_scope :not_voted_by_me, :type => :boolean do |controller, scope|
-    #     scope.not_voted_by(controller.current_user.id) 
+    #     scope.not_voted_by(controller.current_user.id)
     #   end
     #
     def has_scope(*scopes, &block)

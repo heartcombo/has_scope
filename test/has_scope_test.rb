@@ -42,7 +42,7 @@ class TreesController < ApplicationController
     def show_all_colors?
       false
     end
-    
+
     def default_render
       render :text => action_name
     end
