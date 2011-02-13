@@ -1,11 +1,9 @@
-source "http://rubygems.org"
+source :rubygems
 
-gem "rails", "3.0.0"
-gem "mocha"
+gemspec
 
 if RUBY_VERSION < "1.9"
 	gem "ruby-debug"
 else
   gem "test-unit"
 end
-
