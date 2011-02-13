@@ -12,7 +12,7 @@ module HasScope
     base.class_eval do
       extend ClassMethods
       helper_method :current_scopes
-      class_inheritable_hash :scopes_configuration, :instance_writer => false
+      class_attribute :scopes_configuration, :instance_writer => false
     end
   end
 
