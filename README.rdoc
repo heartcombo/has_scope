@@ -35,11 +35,11 @@ Then for each request:
   /graduations?featured=true
   #=> calls the named scope and bring featured graduations
 
-  /graduations?featured=true&by_degree=phd
-  #=> brings featured graduations with phd degree
-
   /graduations?params[by_period][started_at]=20100701&params[by_period][ended_at]=20101013
   #=> brings graduations in the given period
+
+  /graduations?featured=true&by_degree=phd
+  #=> brings featured graduations with phd degree
 
 You can retrieve all the scopes applied in one action with <tt>current_scopes</tt> method.
 In the last case, it would return: { :featured => true, :by_degree => "phd" }.
