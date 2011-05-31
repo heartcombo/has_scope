@@ -48,6 +48,15 @@ class TreesController < ApplicationController
     end
 end
 
+class BonsaisController < TreesController
+  has_scope :categories, :if => :categories?
+
+  protected
+    def categories?
+      false
+    end
+end
+
 class HasScopeTest < ActionController::TestCase
   tests TreesController
 
@@ -220,6 +229,11 @@ class HasScopeTest < ActionController::TestCase
      get :index, :by_category => 'for'
      assert_equal([mock_tree], assigns(:trees))
      assert_equal({ :by_category => 'for' }, current_scopes)
+   end
+
+   def test_overwritten_scope
+     assert_nil(TreesController.scopes_configuration[:categories][:if])
+     assert_equal(:categories?, BonsaisController.scopes_configuration[:categories][:if])
    end
 
   protected
