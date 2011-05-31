@@ -12,7 +12,7 @@ module HasScope
     base.class_eval do
       extend ClassMethods
       helper_method :current_scopes
-      class_inheritable_hash :scopes_configuration, :instance_writer => false
+      class_attribute :scopes_configuration, :instance_writer => false
     end
   end
 
@@ -79,11 +79,11 @@ module HasScope
       options[:only]   = Array(options[:only])
       options[:except] = Array(options[:except])
 
-      self.scopes_configuration ||= {}
+      self.scopes_configuration = (self.scopes_configuration || {}).dup
 
       scopes.each do |scope|
         self.scopes_configuration[scope] ||= { :as => scope, :type => :default, :block => block }
-        self.scopes_configuration[scope].merge!(options)
+        self.scopes_configuration[scope] = self.scopes_configuration[scope].merge(options)
       end
     end
   end
