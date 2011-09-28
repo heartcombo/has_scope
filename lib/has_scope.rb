@@ -11,7 +11,6 @@ module HasScope
   def self.included(base)
     base.class_eval do
       extend ClassMethods
-      helper_method :current_scopes
       class_attribute :scopes_configuration, :instance_writer => false
     end
   end
@@ -184,4 +183,7 @@ module HasScope
   end
 end
 
-ActionController::Base.send :include, HasScope
+ActionController::Base.instance_eval do
+  include HasScope
+  helper_method :current_scopes
+end
