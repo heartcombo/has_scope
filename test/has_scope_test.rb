@@ -247,3 +247,22 @@ class HasScopeTest < ActionController::TestCase
     end
 end
 
+class TreeHugger
+  include HasScope
+
+  has_scope :color
+
+  def by_color
+    apply_scopes(Tree, :color => 'blue')
+  end
+
+end
+
+class HasScopeOutsideControllerTest < ActiveSupport::TestCase
+
+  def test_has_scope_usable_outside_controller
+    Tree.expects(:color).with('blue')
+    TreeHugger.new.by_color
+  end
+
+end
