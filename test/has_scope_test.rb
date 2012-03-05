@@ -170,16 +170,11 @@ class HasScopeTest < ActionController::TestCase
     assert_equal({ :categories => array }, current_scopes)
   end
 
-  def test_invalid_type_hash_for_default_type_scope
-    assert_raise RuntimeError do
-      get :index, :color => { :blue => :red }
-    end
-  end
-
-  def test_invalid_type_string_for_hash_type_scope
-    assert_raise RuntimeError do
-      get :index, :paginate => "1"
-    end
+  def test_scope_of_invalid_type_silently_fails
+    Tree.expects(:all).returns([mock_tree])
+    get :index, :paginate => "1"
+    assert_equal([mock_tree], assigns(:trees))
+    assert_equal({}, current_scopes)
   end
 
   def test_scope_is_called_with_default_value

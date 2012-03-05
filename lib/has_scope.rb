@@ -129,9 +129,7 @@ module HasScope
   def parse_value(type, key, value) #:nodoc:
     if type == :boolean
       TRUE_VALUES.include?(value)
-    elsif value && ALLOWED_TYPES[type].none?{ |klass| value.is_a?(klass) }
-      raise "Expected type :#{type} in params[:#{key}], got #{value.class}"
-    else
+    elsif value && ALLOWED_TYPES[type].any?{ |klass| value.is_a?(klass) }
       value
     end
   end
