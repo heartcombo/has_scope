@@ -108,4 +108,4 @@ If you discover any bugs or want to drop a line, feel free to create an issue on
 
 http://github.com/plataformatec/has_scope/issues
 
-MIT License. Copyright 2012 Plataformatec. http://blog.plataformatec.com.br
+MIT License. Copyright 2009-2012 Plataformatec. http://blog.plataformatec.com.br
