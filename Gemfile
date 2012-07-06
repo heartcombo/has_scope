@@ -2,10 +2,11 @@ source :rubygems
 
 gemspec
 
-gem "rails", "~> 3.0.3"
+gem "actionpack", "~> 3.2.0"
+gem "activesupport", "~> 3.2.0"
 
 if RUBY_VERSION < "1.9"
-	gem "ruby-debug"
+  gem "ruby-debug"
 else
   gem "test-unit"
 end
