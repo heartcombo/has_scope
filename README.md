@@ -5,8 +5,8 @@ Imagine the following model called graduations:
 
 ```ruby
 class Graduation < ActiveRecord::Base
-  named_scope :featured, :conditions => { :featured => true }
-  named_scope :by_degree, proc {|degree| { :conditions => { :degree => degree } } }
+  scope :featured, where(:featured => true)
+  scope :by_degree, proc { |degree| where(:degree => degree) }
 end
 ```
 
@@ -54,16 +54,10 @@ In the last case, it would return: { :featured => true, :by_degree => "phd" }.
 
 ## Installation
 
-HasScope is available as gem on Gemcutter, so just run the following:
+Add `has_scope` to your Gemfile or install it from Rubygems.
 
-```
-sudo gem install has_scope
-```
-
-If you want it as plugin, just do:
-
-```
-script/plugin install git://github.com/plataformatec/has_scope.git
+```ruby
+gem 'has_scope'
 ```
 
 ## Options
@@ -104,7 +98,7 @@ When used with booleans, it just receives two arguments and is just invoked if t
 
 ```ruby
 has_scope :not_voted_by_me, :type => :boolean do |controller, scope|
-  scope.not_voted_by(controller.current_user.id) 
+  scope.not_voted_by(controller.current_user.id)
 end
 ```
 
@@ -114,4 +108,4 @@ If you discover any bugs or want to drop a line, feel free to create an issue on
 
 http://github.com/plataformatec/has_scope/issues
 
-MIT License. Copyright 2009 Plataforma Tecnologia. http://blog.plataformatec.com.br
+MIT License. Copyright 2012 Plataformatec. http://blog.plataformatec.com.br
