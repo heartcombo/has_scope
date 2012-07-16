@@ -11,6 +11,7 @@ Gem::Specification.new do |s|
   s.homepage    = "http://github.com/plataformatec/has_scope"
   s.description = "Maps controller filters to your resource scopes"
   s.authors     = ['José Valim']
+  s.license     = 'MIT'
 
   s.rubyforge_project = "has_scope"
 
@@ -21,6 +22,6 @@ Gem::Specification.new do |s|
 
   s.rdoc_options = ["--charset=UTF-8"]
   s.extra_rdoc_files = [
-    "README.rdoc"
+    "README.md"
   ]
 end
