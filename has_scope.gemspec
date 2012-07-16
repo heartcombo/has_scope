@@ -7,10 +7,11 @@ Gem::Specification.new do |s|
   s.version     = HasScope::VERSION.dup
   s.platform    = Gem::Platform::RUBY
   s.summary     = "Maps controller filters to your resource scopes."
-  s.email       = "developers@plataformatec.com.br"
+  s.email       = "contact@plataformatec.com.br"
   s.homepage    = "http://github.com/plataformatec/has_scope"
   s.description = "Maps controller filters to your resource scopes"
   s.authors     = ['José Valim']
+  s.license     = 'MIT'
 
   s.rubyforge_project = "has_scope"
 
