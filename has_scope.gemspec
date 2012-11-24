@@ -30,6 +30,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency "mocha", "~> 0.12.0"
   s.add_development_dependency "rake"
   if RUBY_VERSION < "1.9"
+    s.add_development_dependency "rdoc"
     s.add_development_dependency "ruby-debug"
   else
     s.add_development_dependency "test-unit"
