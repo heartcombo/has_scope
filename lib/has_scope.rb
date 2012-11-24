@@ -181,7 +181,7 @@ module HasScope
   end
 end
 
-ActionController::Base.instance_eval do
+ActiveSupport.on_load :action_controller do
   include HasScope
   helper_method :current_scopes
 end
