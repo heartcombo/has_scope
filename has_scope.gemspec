@@ -34,6 +34,8 @@ Gem::Specification.new do |s|
     s.add_development_dependency "ruby-debug"
   else
     s.add_development_dependency "test-unit"
-    s.add_development_dependency "debugger"
+    if RUBY_VERSION < "2.0"
+      s.add_development_dependency "debugger"
+    end
   end
 end
