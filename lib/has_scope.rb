@@ -63,7 +63,7 @@ module HasScope
     def has_scope(*scopes, &block)
       options = scopes.extract_options!
       options.symbolize_keys!
-      options.assert_valid_keys(:type, :only, :except, :if, :unless, :default, :as, :using, :allow_blank)
+      options.assert_valid_keys(:type, :only, :except, :if, :unless, :default, :as, :using, :allow_blank, :in)
 
       if options.key?(:using)
         if options.key?(:type) && options[:type] != :hash
@@ -81,6 +81,11 @@ module HasScope
       self.scopes_configuration = (self.scopes_configuration || {}).dup
 
       scopes.each do |scope|
+        if options.key?(:in)
+          options[:type] = :hash
+          options[:as] = options[:in]
+          options[:using] ||= scope
+        end
         self.scopes_configuration[scope] ||= { :as => scope, :type => :default, :block => block }
         self.scopes_configuration[scope] = self.scopes_configuration[scope].merge(options)
       end
@@ -115,6 +120,9 @@ module HasScope
       end
 
       value = parse_value(options[:type], key, value)
+      if value && options[:in]
+        call_scope = value.select { |k, v| options[:using].include?(k.to_sym) && v.present? }.any?
+      end
 
       if call_scope && (value.present? || options[:allow_blank])
         current_scopes[key] = value
