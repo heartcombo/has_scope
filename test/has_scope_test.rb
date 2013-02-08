@@ -161,6 +161,33 @@ class HasScopeTest < ActionController::TestCase
     assert_equal({ :args_paginate => hash }, current_scopes)
   end
 
+  def test_hash_with_blank_values_is_ignored
+    hash = { "page" => "", "per_page" => "" }
+    Tree.expects(:paginate).never
+    Tree.expects(:all).returns([mock_tree])
+    get :index, :paginate => hash
+    assert_equal([mock_tree], assigns(:trees))
+    assert_equal({ }, current_scopes)
+  end
+
+  def test_nested_hash_with_blank_values_is_ignored
+    hash = { "parent" => {"children" => ""} }
+    Tree.expects(:paginate).never
+    Tree.expects(:all).returns([mock_tree])
+    get :index, :paginate => hash
+    assert_equal([mock_tree], assigns(:trees))
+    assert_equal({ }, current_scopes)
+  end
+
+  def test_nested_blank_array_param_is_ignored
+    hash = { "parent" => [""] }
+    Tree.expects(:paginate).never
+    Tree.expects(:all).returns([mock_tree])
+    get :index, :paginate => hash
+    assert_equal([mock_tree], assigns(:trees))
+    assert_equal({ }, current_scopes)
+  end
+
   def test_scope_of_type_array
     array = %w(book kitchen sport)
     Tree.expects(:categories).with(array).returns(Tree)
@@ -168,6 +195,14 @@ class HasScopeTest < ActionController::TestCase
     get :index, :categories => array
     assert_equal([mock_tree], assigns(:trees))
     assert_equal({ :categories => array }, current_scopes)
+  end
+
+  def test_array_of_blank_values_is_ignored
+    Tree.expects(:categories).never
+    Tree.expects(:all).returns([mock_tree])
+    get :index, :categories => [""]
+    assert_equal([mock_tree], assigns(:trees))
+    assert_equal({ }, current_scopes)
   end
 
   def test_scope_of_invalid_type_silently_fails

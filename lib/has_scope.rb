@@ -115,6 +115,7 @@ module HasScope
       end
 
       value = parse_value(options[:type], key, value)
+      value = normalize_blanks(value)
 
       if call_scope && (value.present? || options[:allow_blank])
         current_scopes[key] = value
@@ -130,6 +131,18 @@ module HasScope
     if type == :boolean
       TRUE_VALUES.include?(value)
     elsif value && ALLOWED_TYPES[type].any?{ |klass| value.is_a?(klass) }
+      value
+    end
+  end
+
+  # Screens pseudo-blank params.
+  def normalize_blanks(value) #:nodoc:
+    return value if value.nil?
+    if value.is_a?(Array)
+      value.select { |v| v.present? }
+    elsif value.is_a?(Hash)
+      value.select { |k, v| normalize_blanks(v).present? }.with_indifferent_access
+    else
       value
     end
   end
