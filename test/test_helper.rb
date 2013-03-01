@@ -17,7 +17,7 @@ require 'has_scope'
 
 HasScope::Routes = ActionDispatch::Routing::RouteSet.new
 HasScope::Routes.draw do
-  match '/:controller(/:action(/:id))'
+  get '/:controller(/:action(/:id))'
 end
 
 class ApplicationController < ActionController::Base
