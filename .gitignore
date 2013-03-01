@@ -1,2 +1,2 @@
 .bundle
-Gemfile.lock
+*.lock
