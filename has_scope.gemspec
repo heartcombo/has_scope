@@ -25,14 +25,6 @@ Gem::Specification.new do |s|
     "README.md"
   ]
 
-  s.add_runtime_dependency "actionpack", "~> 3.2.0"
-  s.add_runtime_dependency "activesupport", "~> 3.2.0"
-  s.add_development_dependency "mocha", "~> 0.12.0"
-  s.add_development_dependency "rake"
-  if RUBY_VERSION < "1.9"
-    s.add_development_dependency "rdoc"
-    s.add_development_dependency "ruby-debug"
-  else
-    s.add_development_dependency "test-unit"
-  end
+  s.add_runtime_dependency "actionpack", ">= 3.2.0"
+  s.add_runtime_dependency "activesupport", ">= 3.2.0"
 end
