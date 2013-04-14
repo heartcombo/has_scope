@@ -111,7 +111,9 @@ module HasScope
         value, call_scope = hash[key], true
       elsif options.key?(:default)
         value, call_scope = options[:default], true
-        value = value.call(self) if value.is_a?(Proc)
+        if value.is_a?(Proc)
+          value = value.arity == 0 ? value.call : value.call(self)
+        end
       end
 
       value = parse_value(options[:type], key, value)
