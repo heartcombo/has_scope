@@ -1,5 +1,7 @@
 # encoding: UTF-8
-require 'rake'
+
+require 'bundler/gem_tasks'
+
 require 'rake/testtask'
 require 'rdoc/task'
 
