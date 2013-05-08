@@ -9,8 +9,8 @@ Imagine the following model called graduations:
 
 ```ruby
 class Graduation < ActiveRecord::Base
-  scope :featured, where(:featured => true)
-  scope :by_degree, proc { |degree| where(:degree => degree) }
+  scope :featured, -> { where(:featured => true) }
+  scope :by_degree, -> degree { where(:degree => degree) }
 end
 ```
 
@@ -88,7 +88,7 @@ HasScope supports several options:
 
 ## Block usage
 
-has_scope also accepts a block. The controller, current scope and value are yielded
+`has_scope` also accepts a block. The controller, current scope and value are yielded
 to the block so the user can apply the scope on its own. This is useful in case we
 need to manipulate the given value:
 
