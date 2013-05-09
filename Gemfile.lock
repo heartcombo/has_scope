@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    has_scope (0.5.1)
+    has_scope (0.6.0.rc)
       actionpack (>= 3.2, < 5)
       activesupport (>= 3.2, < 5)
 
