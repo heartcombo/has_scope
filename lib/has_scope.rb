@@ -1,11 +1,13 @@
 module HasScope
   TRUE_VALUES = ["true", true, "1", 1]
+  # FALSE_VALUES = ["false", false, "0", 0]
 
   ALLOWED_TYPES = {
     :array   => [ Array ],
     :hash    => [ Hash ],
     :boolean => [ Object ],
-    :default => [ String, Numeric ]
+    :passable_boolean => [ TrueClass, FalseClass ],
+    :default => [ String, Numeric, TrueClass, FalseClass ]
   }
 
   def self.included(base)
@@ -106,6 +108,7 @@ module HasScope
     self.scopes_configuration.each do |scope, options|
       next unless apply_scope_to_action?(options)
       key = options[:as]
+      scope_type = options[:type]
 
       if hash.key?(key)
         value, call_scope = hash[key], true
@@ -114,10 +117,11 @@ module HasScope
         value = value.call(self) if value.is_a?(Proc)
       end
 
-      value = parse_value(options[:type], key, value)
+      value = parse_value(scope_type, key, value)
       value = normalize_blanks(value)
 
-      if call_scope && (value.present? || options[:allow_blank])
+      is_passable = value.present? || options[:allow_blank] || scope_type == :passable_boolean
+      if call_scope && is_passable
         current_scopes[key] = value
         target = call_scope_by_type(options[:type], scope, target, value, options)
       end
@@ -128,7 +132,7 @@ module HasScope
 
   # Set the real value for the current scope if type check.
   def parse_value(type, key, value) #:nodoc:
-    if type == :boolean
+    if [:boolean, :passable_boolean].include?(type)
       TRUE_VALUES.include?(value)
     elsif value && ALLOWED_TYPES[type].any?{ |klass| value.is_a?(klass) }
       value

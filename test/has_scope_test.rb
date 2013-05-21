@@ -13,6 +13,8 @@ class TreesController < ApplicationController
   has_scope :args_paginate, :type => :hash, :using => [:page, :per_page]
   has_scope :categories, :type => :array
 
+  has_scope :alive, :type => :passable_boolean, :only => :index
+
   has_scope :only_short, :type => :boolean do |controller, scope|
     scope.only_really_short!(controller.object_id)
   end
@@ -265,6 +267,22 @@ class HasScopeTest < ActionController::TestCase
      assert_nil(TreesController.scopes_configuration[:categories][:if])
      assert_equal(:categories?, BonsaisController.scopes_configuration[:categories][:if])
    end
+
+  def test_passable_boolean_scope_is_called_when_boolean_param_is_true
+    Tree.expects(:alive).with(true).returns(Tree).in_sequence
+    Tree.expects(:all).returns([mock_tree])
+    get :index, :alive => 'true'
+    assert_equal([mock_tree], assigns(:trees))
+    assert_equal({ :alive => true }, current_scopes)
+  end
+
+  def test_passable_boolean_scope_is_still_called_when_boolean_param_is_false
+    Tree.expects(:alive).with(false).returns(Tree).in_sequence
+    Tree.expects(:all).returns([mock_tree])
+    get :index, :alive => 'false'
+    assert_equal([mock_tree], assigns(:trees))
+    assert_equal({ :alive => false }, current_scopes)
+  end
 
   protected
 
