@@ -68,6 +68,14 @@ class HasScopeTest < ActionController::TestCase
     assert_equal({ :only_tall => true }, current_scopes)
   end
 
+  def test_boolean_scope_is_called_when_boolean_param_is_on
+    Tree.expects(:only_tall).with().returns(Tree).in_sequence
+    Tree.expects(:all).returns([mock_tree]).in_sequence
+    get :index, :only_tall => 'on'
+    assert_equal([mock_tree], assigns(:trees))
+    assert_equal({ :only_tall => true }, current_scopes)
+  end
+
   def test_boolean_scope_is_not_called_when_boolean_param_is_false
     Tree.expects(:only_tall).never
     Tree.expects(:all).returns([mock_tree])
