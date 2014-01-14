@@ -5,7 +5,7 @@ module HasScope
     :array   => [ Array ],
     :hash    => [ Hash ],
     :boolean => [ Object ],
-    :default => [ String, Numeric ]
+    :default => [ String, Numeric, Symbol ]
   }
 
   def self.included(base)
