@@ -11,6 +11,7 @@ Imagine the following model called graduations:
 class Graduation < ActiveRecord::Base
   scope :featured, -> { where(:featured => true) }
   scope :by_degree, -> degree { where(:degree => degree) }
+  scope :by_period, -> started_at, ended_at { where("started_at = ? AND ended_at = ?", started_at, ended_at) }
 end
 ```
 
@@ -29,7 +30,7 @@ Now, if you want to apply them to an specific resource, you just need to call `a
 class GraduationsController < ApplicationController
   has_scope :featured, :type => :boolean
   has_scope :by_degree
-  has_scope :by_period, :using => [:started_at, :ended_at]
+  has_scope :by_period, :using => [:started_at, :ended_at], :type => :hash
 
   def index
     @graduations = apply_scopes(Graduation).all
@@ -46,7 +47,7 @@ Then for each request:
 /graduations?featured=true
 #=> calls the named scope and bring featured graduations
 
-/graduations?params[by_period][started_at]=20100701&params[by_period][ended_at]=20101013
+/graduations?by_period[started_at]=20100701&by_period[ended_at]=20101013
 #=> brings graduations in the given period
 
 /graduations?featured=true&by_degree=phd
