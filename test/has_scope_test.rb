@@ -8,6 +8,7 @@ class TreesController < ApplicationController
   has_scope :only_tall, :type => :boolean, :only => :index, :if => :restrict_to_only_tall_trees?
   has_scope :shadown_range, :default => 10, :except => [ :index, :show, :new ]
   has_scope :root_type, :as => :root, :allow_blank => true
+  has_scope :planted_before, :default => proc { Date.today }
   has_scope :calculate_height, :default => proc {|c| c.session[:height] || 20 }, :only => :new
   has_scope :paginate, :type => :hash
   has_scope :args_paginate, :type => :hash, :using => [:page, :per_page]
@@ -236,35 +237,44 @@ class HasScopeTest < ActionController::TestCase
     assert_equal({ :root => 'outside' }, current_scopes)
   end
 
-  def test_scope_with_default_value_as_proc
+  def test_scope_with_default_value_as_a_proc_without_argument
+    Date.expects(:today).returns("today")
+    Tree.expects(:planted_before).with("today").returns(Tree)
+    Tree.expects(:all).returns([mock_tree])
+    get :index
+    assert_equal([mock_tree], assigns(:trees))
+    assert_equal({ :planted_before => "today" }, current_scopes)
+  end
+
+  def test_scope_with_default_value_as_proc_with_argument
     session[:height] = 100
     Tree.expects(:calculate_height).with(100).returns(Tree).in_sequence
     Tree.expects(:new).returns(mock_tree).in_sequence
     get :new
     assert_equal(mock_tree, assigns(:tree))
     assert_equal({ :calculate_height => 100 }, current_scopes)
-   end
+  end
 
-   def test_scope_with_boolean_block
-     Tree.expects(:only_really_short!).with(@controller.object_id).returns(Tree)
-     Tree.expects(:all).returns([mock_tree])
-     get :index, :only_short => 'true'
-     assert_equal([mock_tree], assigns(:trees))
-     assert_equal({ :only_short => true }, current_scopes)
-   end
+  def test_scope_with_boolean_block
+    Tree.expects(:only_really_short!).with(@controller.object_id).returns(Tree)
+    Tree.expects(:all).returns([mock_tree])
+    get :index, :only_short => 'true'
+    assert_equal([mock_tree], assigns(:trees))
+    assert_equal({ :only_short => true }, current_scopes)
+  end
 
-   def test_scope_with_other_block_types
-     Tree.expects(:by_given_category).with(@controller.object_id, 'for_id').returns(Tree)
-     Tree.expects(:all).returns([mock_tree])
-     get :index, :by_category => 'for'
-     assert_equal([mock_tree], assigns(:trees))
-     assert_equal({ :by_category => 'for' }, current_scopes)
-   end
+  def test_scope_with_other_block_types
+    Tree.expects(:by_given_category).with(@controller.object_id, 'for_id').returns(Tree)
+    Tree.expects(:all).returns([mock_tree])
+    get :index, :by_category => 'for'
+    assert_equal([mock_tree], assigns(:trees))
+    assert_equal({ :by_category => 'for' }, current_scopes)
+  end
 
-   def test_overwritten_scope
-     assert_nil(TreesController.scopes_configuration[:categories][:if])
-     assert_equal(:categories?, BonsaisController.scopes_configuration[:categories][:if])
-   end
+  def test_overwritten_scope
+    assert_nil(TreesController.scopes_configuration[:categories][:if])
+    assert_equal(:categories?, BonsaisController.scopes_configuration[:categories][:if])
+  end
 
   protected
 
