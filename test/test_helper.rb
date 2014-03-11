@@ -1,11 +1,11 @@
-require 'bundler'
+require 'bundler/setup'
 
-Bundler.setup
-require 'test/unit'
-require 'mocha/setup'
+require 'minitest/autorun'
+require 'mocha'
+require 'mocha/mini_test'
 
 # Configure Rails
-ENV["RAILS_ENV"] = "test"
+ENV['RAILS_ENV'] = 'test'
 
 require 'active_support'
 require 'action_controller'
