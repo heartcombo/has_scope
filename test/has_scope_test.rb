@@ -13,6 +13,8 @@ class TreesController < ApplicationController
   has_scope :paginate, :type => :hash
   has_scope :args_paginate, :type => :hash, :using => [:page, :per_page]
   has_scope :categories, :type => :array
+  has_scope :title, :in => :q
+  has_scope :content, :in => :q
 
   has_scope :only_short, :type => :boolean do |controller, scope|
     scope.only_really_short!(controller.object_id)
@@ -269,6 +271,16 @@ class HasScopeTest < ActionController::TestCase
     get :index, :by_category => 'for'
     assert_equal([mock_tree], assigns(:trees))
     assert_equal({ :by_category => 'for' }, current_scopes)
+  end
+
+  def test_scope_with_nested_hash_and_in_option
+    hash = { 'title' => 'the-title', 'content' => 'the-content' }
+    Tree.expects(:title).with('the-title').returns(Tree)
+    Tree.expects(:content).with('the-content').returns(Tree)
+    Tree.expects(:all).returns([mock_tree])
+    get :index, :q => hash
+    assert_equal([mock_tree], assigns(:trees))
+    assert_equal({ :q => hash }, current_scopes)
   end
 
   def test_overwritten_scope
