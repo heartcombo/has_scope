@@ -87,7 +87,7 @@ HasScope supports several options:
 
 * `:allow_blank` - Blank values are not sent to scopes by default. Set to true to overwrite.
 
-* `:in` - A shortcut for combining the `:using` option with  nested hashes.
+* `:in` - A shortcut for combining the `:using` option with nested hashes.
 
 ## Block usage
 
