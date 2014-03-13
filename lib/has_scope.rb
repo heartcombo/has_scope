@@ -63,7 +63,12 @@ module HasScope
     def has_scope(*scopes, &block)
       options = scopes.extract_options!
       options.symbolize_keys!
-      options.assert_valid_keys(:type, :only, :except, :if, :unless, :default, :as, :using, :allow_blank)
+      options.assert_valid_keys(:type, :only, :except, :if, :unless, :default, :as, :using, :allow_blank, :in)
+
+      if options.key?(:in)
+        options[:as] = options[:in]
+        options[:using] = scopes
+      end
 
       if options.key?(:using)
         if options.key?(:type) && options[:type] != :hash

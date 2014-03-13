@@ -87,6 +87,8 @@ HasScope supports several options:
 
 * `:allow_blank` - Blank values are not sent to scopes by default. Set to true to overwrite.
 
+* `:in` - A shortcut for combining the `:using` option with nested hashes.
+
 ## Block usage
 
 `has_scope` also accepts a block. The controller, current scope and value are yielded
