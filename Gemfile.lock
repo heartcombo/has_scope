@@ -8,36 +8,34 @@ PATH
 GEM
   remote: https://rubygems.org/
   specs:
-    actionpack (4.1.0.rc1)
-      actionview (= 4.1.0.rc1)
-      activesupport (= 4.1.0.rc1)
+    actionpack (4.1.0)
+      actionview (= 4.1.0)
+      activesupport (= 4.1.0)
       rack (~> 1.5.2)
       rack-test (~> 0.6.2)
-    actionview (4.1.0.rc1)
-      activesupport (= 4.1.0.rc1)
+    actionview (4.1.0)
+      activesupport (= 4.1.0)
       builder (~> 3.1)
       erubis (~> 2.7.0)
-    activesupport (4.1.0.rc1)
+    activesupport (4.1.0)
       i18n (~> 0.6, >= 0.6.9)
       json (~> 1.7, >= 1.7.7)
       minitest (~> 5.1)
       thread_safe (~> 0.1)
       tzinfo (~> 1.1)
-    atomic (1.1.15)
     builder (3.2.2)
     erubis (2.7.0)
     i18n (0.6.9)
     json (1.8.1)
     metaclass (0.0.4)
-    minitest (5.3.0)
+    minitest (5.3.2)
     mocha (1.0.0)
       metaclass (~> 0.0.1)
     rack (1.5.2)
     rack-test (0.6.2)
       rack (>= 1.0)
     rake (10.0.4)
-    thread_safe (0.2.0)
-      atomic (>= 1.1.7, < 2)
+    thread_safe (0.3.3)
     tzinfo (1.1.0)
       thread_safe (~> 0.1)
 
@@ -45,8 +43,8 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  actionpack (= 4.1.0.rc1)
-  activesupport (= 4.1.0.rc1)
+  actionpack (= 4.1.0)
+  activesupport (= 4.1.0)
   has_scope!
   mocha (~> 1.0.0)
   rake
