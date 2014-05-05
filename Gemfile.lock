@@ -28,13 +28,13 @@ GEM
     i18n (0.6.9)
     json (1.8.1)
     metaclass (0.0.4)
-    minitest (5.3.2)
+    minitest (5.3.3)
     mocha (1.0.0)
       metaclass (~> 0.0.1)
     rack (1.5.2)
     rack-test (0.6.2)
       rack (>= 1.0)
-    rake (10.0.4)
+    rake (10.3.1)
     thread_safe (0.3.3)
     tzinfo (1.1.0)
       thread_safe (~> 0.1)
@@ -43,8 +43,8 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  actionpack (= 4.1.0)
-  activesupport (= 4.1.0)
+  actionpack (~> 4.1.0)
+  activesupport (~> 4.1.0)
   has_scope!
   mocha (~> 1.0.0)
   rake
