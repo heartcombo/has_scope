@@ -12,6 +12,7 @@ module HasScope
     base.class_eval do
       extend ClassMethods
       class_attribute :scopes_configuration, :instance_writer => false
+      self.scopes_configuration = {}
     end
   end
 
@@ -83,11 +84,11 @@ module HasScope
       options[:only]   = Array(options[:only])
       options[:except] = Array(options[:except])
 
-      self.scopes_configuration = (self.scopes_configuration || {}).dup
+      self.scopes_configuration = scopes_configuration.dup
 
       scopes.each do |scope|
-        self.scopes_configuration[scope] ||= { :as => scope, :type => :default, :block => block }
-        self.scopes_configuration[scope] = self.scopes_configuration[scope].merge(options)
+        scopes_configuration[scope] ||= { :as => scope, :type => :default, :block => block }
+        scopes_configuration[scope] = self.scopes_configuration[scope].merge(options)
       end
     end
   end
@@ -106,9 +107,7 @@ module HasScope
   #   end
   #
   def apply_scopes(target, hash=params)
-    return target unless scopes_configuration
-
-    self.scopes_configuration.each do |scope, options|
+    scopes_configuration.each do |scope, options|
       next unless apply_scope_to_action?(options)
       key = options[:as]
 
