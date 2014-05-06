@@ -144,10 +144,10 @@ module HasScope
 
   # Screens pseudo-blank params.
   def normalize_blanks(value) #:nodoc:
-    return value if value.nil?
-    if value.is_a?(Array)
+    case value
+    when Array
       value.select { |v| v.present? }
-    elsif value.is_a?(Hash)
+    when Hash
       value.select { |k, v| normalize_blanks(v).present? }.with_indifferent_access
     else
       value
