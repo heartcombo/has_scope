@@ -184,14 +184,14 @@ module HasScope
   # method, or string evals to the expected value.
   def applicable?(string_proc_or_symbol, expected) #:nodoc:
     case string_proc_or_symbol
-      when String
-        eval(string_proc_or_symbol) == expected
-      when Proc
-        string_proc_or_symbol.call(self) == expected
-      when Symbol
-        send(string_proc_or_symbol) == expected
-      else
-        true
+    when String
+      eval(string_proc_or_symbol) == expected
+    when Proc
+      string_proc_or_symbol.call(self) == expected
+    when Symbol
+      send(string_proc_or_symbol) == expected
+    else
+      true
     end
   end
 
