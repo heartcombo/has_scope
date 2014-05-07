@@ -157,7 +157,7 @@ module HasScope
   def call_scope_by_type(type, scope, target, value, options) #:nodoc:
     block = options[:block]
 
-    if type == :boolean
+    if type == :boolean && !options[:allow_blank]
       block ? block.call(self, target) : target.send(scope)
     elsif value && options.key?(:using)
       value = value.values_at(*options[:using])
