@@ -15,13 +15,14 @@ class TreesController < ApplicationController
   has_scope :categories, :type => :array
   has_scope :title, :in => :q
   has_scope :content, :in => :q
+  has_scope :conifer, type: :boolean, :allow_blank => true
 
-  has_scope :only_short, :type => :boolean do |controller, scope|
-    scope.only_really_short!(controller.object_id)
+  has_scope :only_short, :type => :boolean do |scope|
+    scope.only_really_short!(object_id)
   end
 
-  has_scope :by_category do |controller, scope, value|
-    scope.by_given_category(controller.object_id, value + "_id")
+  has_scope :by_category do |scope, value|
+    scope.by_given_category(object_id, value + "_id")
   end
 
   def index
@@ -76,7 +77,31 @@ class HasScopeTest < ActionController::TestCase
     Tree.expects(:all).returns([mock_tree])
     get :index, :only_tall => 'false'
     assert_equal([mock_tree], assigns(:trees))
-    assert_equal({}, current_scopes)
+    assert_equal({ }, current_scopes)
+  end
+
+  def test_boolean_scope_with_allow_blank_is_called_when_boolean_param_is_true
+    Tree.expects(:conifer).with(true).returns(Tree).in_sequence
+    Tree.expects(:all).returns([mock_tree]).in_sequence
+    get :index, :conifer => 'true'
+    assert_equal([mock_tree], assigns(:trees))
+    assert_equal({ :conifer => true }, current_scopes)
+  end
+
+  def test_boolean_scope_with_allow_blank_is_called_when_boolean_param_is_false
+    Tree.expects(:conifer).with(false).returns(Tree).in_sequence
+    Tree.expects(:all).returns([mock_tree]).in_sequence
+    get :index, :conifer => 'not_true'
+    assert_equal([mock_tree], assigns(:trees))
+    assert_equal({ :conifer => false }, current_scopes)
+  end
+
+  def test_boolean_scope_with_allow_blank_is_not_called_when_boolean_param_is_not_present
+    Tree.expects(:conifer).never
+    Tree.expects(:all).returns([mock_tree])
+    get :index
+    assert_equal([mock_tree], assigns(:trees))
+    assert_equal({ }, current_scopes)
   end
 
   def test_scope_is_called_only_on_index
@@ -106,7 +131,7 @@ class HasScopeTest < ActionController::TestCase
   end
 
   def test_scope_is_called_except_on_index
-    Tree.expects(:shadown_range).with().never
+    Tree.expects(:shadown_range).never
     Tree.expects(:all).returns([mock_tree])
     get :index, :shadown_range => 20
     assert_equal([mock_tree], assigns(:trees))
@@ -212,7 +237,7 @@ class HasScopeTest < ActionController::TestCase
     Tree.expects(:all).returns([mock_tree])
     get :index, :paginate => "1"
     assert_equal([mock_tree], assigns(:trees))
-    assert_equal({}, current_scopes)
+    assert_equal({ }, current_scopes)
   end
 
   def test_scope_is_called_with_default_value

@@ -157,13 +157,13 @@ module HasScope
   def call_scope_by_type(type, scope, target, value, options) #:nodoc:
     block = options[:block]
 
-    if type == :boolean
-      block ? block.call(self, target) : target.send(scope)
+    if type == :boolean && !options[:allow_blank]
+      block ? instance_exec(target, &block) : target.send(scope)
     elsif value && options.key?(:using)
       value = value.values_at(*options[:using])
-      block ? block.call(self, target, value) : target.send(scope, *value)
+      block ? instance_exec(target, value, &block) : target.send(scope, *value)
     else
-      block ? block.call(self, target, value) : target.send(scope, value)
+      block ? instance_exec(target, value, &block) : target.send(scope, value)
     end
   end
 
