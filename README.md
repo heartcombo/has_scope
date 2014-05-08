@@ -129,6 +129,17 @@ has_scope :not_voted_by_me, :type => :boolean do |controller, scope|
 end
 ```
 
+## Apply scope on every request
+
+To apply scope on every request set default value and `allow_blank: true`:
+
+```ruby
+has_scope :with_includes, default: nil, allow_blank: true, only: :show
+
+# model:
+scope :with_includes, ->(*) { includes(:children) }
+```
+
 ## Bugs and Feedback
 
 If you discover any bugs or want to drop a line, feel free to create an issue on GitHub.
