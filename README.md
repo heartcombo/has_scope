@@ -110,12 +110,12 @@ scope :active, ->(value = true) { where(active: value) }
 
 ## Block usage
 
-`has_scope` also accepts a block. The controller, current scope and value are yielded
-to the block so the user can apply the scope on its own. This is useful in case we
-need to manipulate the given value:
+`has_scope` also accepts a block. Block is executed in controller's context,
+current scope and value are yielded so the user can apply the scope on its own.
+This is useful in case we need to manipulate the given value:
 
 ```ruby
-has_scope :category do |controller, scope, value|
+has_scope :category do |scope, value|
   value != "all" ? scope.by_category(value) : scope
 end
 ```
@@ -124,7 +124,7 @@ When used with booleans without `:allow_blank`, it just receives two arguments
 and is just invoked if true is given:
 
 ```ruby
-has_scope :not_voted_by_me, :type => :boolean do |controller, scope|
+has_scope :not_voted_by_me, :type => :boolean do |scope|
   scope.not_voted_by(controller.current_user.id)
 end
 ```

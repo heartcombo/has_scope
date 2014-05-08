@@ -17,12 +17,12 @@ class TreesController < ApplicationController
   has_scope :content, :in => :q
   has_scope :conifer, type: :boolean, :allow_blank => true
 
-  has_scope :only_short, :type => :boolean do |controller, scope|
-    scope.only_really_short!(controller.object_id)
+  has_scope :only_short, :type => :boolean do |scope|
+    scope.only_really_short!(object_id)
   end
 
-  has_scope :by_category do |controller, scope, value|
-    scope.by_given_category(controller.object_id, value + "_id")
+  has_scope :by_category do |scope, value|
+    scope.by_given_category(object_id, value + "_id")
   end
 
   def index

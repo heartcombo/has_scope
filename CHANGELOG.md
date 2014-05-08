@@ -1,5 +1,6 @@
 ## Unreleased
 
+* Scope blocks are executed in controller's context
 * Boolean scopes with `allow_blank: true` are called with values, working as any other scopes
 * Add `:in` option: a shortcut for combining the `:using` option with nested hashes
 * Support Rails 4.1
