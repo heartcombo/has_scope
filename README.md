@@ -131,6 +131,20 @@ has_scope :not_voted_by_me, :type => :boolean do |controller, scope|
 end
 ```
 
+## Apply scope on every request
+
+To apply scope on every request set default value and `allow_blank: true`:
+
+```ruby
+has_scope :available, default: nil, allow_blank: true, only: :show, unless: :admin?
+
+# model:
+scope :available, ->(*) { where(blocked: false) }
+```
+
+This will allow usual users to get only available items, but admins will
+be able to access blocked items too.
+
 ## Bugs and Feedback
 
 If you discover any bugs or want to drop a line, feel free to create an issue on GitHub.
