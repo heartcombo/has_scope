@@ -69,7 +69,7 @@ gem 'has_scope'
 
 HasScope supports several options:
 
-* `:type` - Checks the type of the parameter sent. If set to :boolean it just calls the named scope, without any argument. By default, it does not allow hashes or arrays to be given, except if type :hash or :array are set.
+* `:type` - Checks the type of the parameter sent. If set to :boolean it just calls the named scope, without any argument. By default, it does not allow hashes or arrays to be given, except if type :hash or :array are set. Symbols are never permitted to prevent memory leaks, so ensure any routing constraints you have that add parameters use string values.
 
 * `:only` - In which actions the scope is applied.
 
