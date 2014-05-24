@@ -69,7 +69,11 @@ gem 'has_scope'
 
 HasScope supports several options:
 
-* `:type` - Checks the type of the parameter sent. If set to :boolean it just calls the named scope, without any argument. By default, it does not allow hashes or arrays to be given, except if type :hash or :array are set. Symbols are never permitted to prevent memory leaks, so ensure any routing constraints you have that add parameters use string values.
+* `:type` - Checks the type of the parameter sent.
+  By default, it does not allow hashes or arrays to be given,
+  except if type `:hash` or `:array` are set.
+  Symbols are never permitted to prevent memory leaks, so ensure any routing
+  constraints you have that add parameters use string values.
 
 * `:only` - In which actions the scope is applied.
 
@@ -89,6 +93,23 @@ HasScope supports several options:
 
 * `:in` - A shortcut for combining the `:using` option with nested hashes.
 
+## Boolean usage
+
+If `type: :boolean` is set it just calls the named scope, without any arguments, when parameter
+is set to a "true" value. `'true'` and `'1'` are parsed as `true`, everything else as `false`.
+
+When boolean scope is set up with `allow_blank: true`, it will call the scope
+with the value as usual scope.
+
+```ruby
+has_scope :visible, type: :boolean
+has_scope :active, type: :boolean, allow_blank: true
+
+# and models with
+scope :visible, -> { where(visible: true) }
+scope :active, ->(value = true) { where(active: value) }
+```
+
 ## Block usage
 
 `has_scope` also accepts a block. The controller, current scope and value are yielded
@@ -101,13 +122,28 @@ has_scope :category do |controller, scope, value|
 end
 ```
 
-When used with booleans, it just receives two arguments and is just invoked if true is given:
+When used with booleans without `:allow_blank`, it just receives two arguments
+and is just invoked if true is given:
 
 ```ruby
 has_scope :not_voted_by_me, :type => :boolean do |controller, scope|
   scope.not_voted_by(controller.current_user.id)
 end
 ```
+
+## Apply scope on every request
+
+To apply scope on every request set default value and `allow_blank: true`:
+
+```ruby
+has_scope :available, default: nil, allow_blank: true, only: :show, unless: :admin?
+
+# model:
+scope :available, ->(*) { where(blocked: false) }
+```
+
+This will allow usual users to get only available items, but admins will
+be able to access blocked items too.
 
 ## Bugs and Feedback
 
