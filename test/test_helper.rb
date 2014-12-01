@@ -24,6 +24,8 @@ class ApplicationController < ActionController::Base
 end
 
 class ActiveSupport::TestCase
+  self.test_order = :random if respond_to?(:test_order=)
+
   setup do
     @routes = HasScope::Routes
   end
