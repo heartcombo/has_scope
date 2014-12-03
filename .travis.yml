@@ -9,6 +9,10 @@ gemfile:
   - gemfiles/Gemfile-rails.3.2.x
   - gemfiles/Gemfile-rails.4.0.x
   - gemfiles/Gemfile-rails.4.1.x
+matrix:
+  allow_failures:
+    - rvm: 2.2
+      gemfile: gemfiles/Gemfile-rails.3.2.x
 notifications:
   email: false
   campfire:
