@@ -156,7 +156,7 @@ module HasScope
   # Call the scope taking into account its type.
   def call_scope_by_type(type, scope, target, value, options) #:nodoc:
     block = options[:block]
-    
+
     if type == :boolean && !options[:allow_blank]
       block ? block.call(self, target) : target.respond_to?(scope) ? target.send(scope, value) : target
     elsif value && options.key?(:using)
