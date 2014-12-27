@@ -1,12 +1,8 @@
 require 'test_helper'
 
-HasScope.allowed_types[:date] = [
-  [String],
-  lambda {|v| Date.parse(v) rescue nil }
-]
+HasScope::ALLOWED_TYPES[:date] = [[String], -> v { Date.parse(v) rescue nil }]
 
-class Tree
-end
+class Tree; end
 
 class TreesController < ApplicationController
   has_scope :color, :unless => :show_all_colors?

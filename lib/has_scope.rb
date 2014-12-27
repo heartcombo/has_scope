@@ -1,15 +1,11 @@
 module HasScope
   TRUE_VALUES = ["true", true, "1", 1]
 
-  class << self
-    attr_accessor :allowed_types
-  end
-
-  self.allowed_types = {
-    :array   => [[ Array ], nil],
-    :hash    => [[ Hash ], nil],
-    :boolean => [[ Object ], lambda {|v| TRUE_VALUES.include?(v) }],
-    :default => [[ String, Numeric ], nil],
+  ALLOWED_TYPES = {
+    :array   => [[ Array ]],
+    :hash    => [[ Hash ]],
+    :boolean => [[ Object ], -> v { TRUE_VALUES.include?(v) }],
+    :default => [[ String, Numeric ]],
   }
 
   def self.included(base)
@@ -138,8 +134,8 @@ module HasScope
 
   # Set the real value for the current scope if type check.
   def parse_value(type, key, value) #:nodoc:
-    klasses, parser = HasScope.allowed_types[type]
-    if klasses.any? {|klass| value.is_a?(klass) }
+    klasses, parser = ALLOWED_TYPES[type]
+    if klasses.any? { |klass| value.is_a?(klass) }
       parser ? parser.call(value) : value
     end
   end
