@@ -1,3 +1,3 @@
 module HasScope
-  VERSION = "0.6.0.rc"
+  VERSION = "0.6.0"
 end

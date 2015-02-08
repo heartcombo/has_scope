@@ -1,4 +1,4 @@
-## Unreleased
+## 0.6.0
 
 * Allow custom types and parsers
 * Boolean scopes with `allow_blank: true` are called with values, working as any other scopes
