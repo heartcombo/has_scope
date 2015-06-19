@@ -1,7 +1,8 @@
 require 'test_helper'
 
-class Tree
-end
+HasScope::ALLOWED_TYPES[:date] = [[String], -> v { Date.parse(v) rescue nil }]
+
+class Tree; end
 
 class TreesController < ApplicationController
   has_scope :color, :unless => :show_all_colors?
@@ -9,6 +10,7 @@ class TreesController < ApplicationController
   has_scope :shadown_range, :default => 10, :except => [ :index, :show, :new ]
   has_scope :root_type, :as => :root, :allow_blank => true
   has_scope :planted_before, :default => proc { Date.today }
+  has_scope :planted_after, :type => :date
   has_scope :calculate_height, :default => proc {|c| c.session[:height] || 20 }, :only => :new
   has_scope :paginate, :type => :hash
   has_scope :args_paginate, :type => :hash, :using => [:page, :per_page]
@@ -280,6 +282,15 @@ class HasScopeTest < ActionController::TestCase
     get :new
     assert_equal(mock_tree, assigns(:tree))
     assert_equal({ :calculate_height => 100 }, current_scopes)
+  end
+
+  def test_scope_with_custom_type
+    parsed = Date.civil(2014,11,11)
+    Tree.expects(:planted_after).with(parsed).returns(Tree)
+    Tree.expects(:all).returns([mock_tree])
+    get :index, :planted_after => "2014-11-11"
+    assert_equal([mock_tree], assigns(:trees))
+    assert_equal({ :planted_after => parsed }, current_scopes)
   end
 
   def test_scope_with_boolean_block

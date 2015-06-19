@@ -1,8 +1,9 @@
-## Unreleased
+## 0.6.0
 
+* Allow custom types and parsers
 * Boolean scopes with `allow_blank: true` are called with values, working as any other scopes
 * Add `:in` option: a shortcut for combining the `:using` option with nested hashes
-* Support Rails 4.1
+* Support Rails 4.1 & 4.2, Ruby 2.2
 
 ## 0.6.0.rc
 
