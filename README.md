@@ -35,6 +35,8 @@ class GraduationsController < ApplicationController
   has_scope :featured, :type => :boolean
   has_scope :by_degree
   has_scope :by_period, :using => [:started_at, :ended_at], :type => :hash
+  has_scope :high_gpa, :scope_by_value :gpa
+  has_scope :low_gpa, :scope_by_value :gpa
 
   def index
     @graduations = apply_scopes(Graduation).all
