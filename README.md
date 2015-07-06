@@ -54,8 +54,10 @@ Then for each request:
 #=> brings featured graduations with phd degree
 ```
 
-You can retrieve all the scopes applied in one action with `current_scopes` method.
-In the last case, it would return: { :featured => true, :by_degree => "phd" }.
+After `apply_scopes` has been called, you can retrieve all the scopes applied in
+one action with `current_scopes` method.
+
+In the last case, it would return: `{ :featured => true, :by_degree => "phd" }`.
 
 ## Installation
 
@@ -92,6 +94,21 @@ HasScope supports several options:
 * `:allow_blank` - Blank values are not sent to scopes by default. Set to true to overwrite.
 
 * `:in` - A shortcut for combining the `:using` option with nested hashes.
+          For example, `has_scope xyz, :in => :abc` is the same as
+          `has_scope xyz, :as => :abc, :using => :xyz, :type => :hash`, and
+          would make the scope apply when the params are "?abc[xyz]=value".
+
+* `:if_value` - For string and numeric types, indicates the value that the param
+                must have if the scope should apply.
+
+* `:unless_value` - For string and numeric types, indicates the value that the
+                    param must have if the scope should NOT apply.
+
+* `:scope_by_value` - A shortcut for combining :as with :if_value set to the
+                      scope name. For example,
+                      `has_scope xyz, :scope_by_value => :filter`
+                      is equivalent to
+                      `has_scope xyz, :as => :filter, :if_value => :xyz`
 
 ## Boolean usage
 
@@ -117,17 +134,21 @@ to the block so the user can apply the scope on its own. This is useful in case 
 need to manipulate the given value:
 
 ```ruby
-has_scope :category do |controller, scope, value|
-  value != "all" ? scope.by_category(value) : scope
+has_scope :category do |controller, target, value|
+  value != "all" ? target.by_category(value) : target
 end
 ```
+
+The `target` argument is the object that was passed to `apply_scopes`, with
+prior scopes applied. The block should either apply one or more scopes, or
+return the target unmodified.
 
 When used with booleans without `:allow_blank`, it just receives two arguments
 and is just invoked if true is given:
 
 ```ruby
-has_scope :not_voted_by_me, :type => :boolean do |controller, scope|
-  scope.not_voted_by(controller.current_user.id)
+has_scope :not_voted_by_me, :type => :boolean do |controller, target|
+  target.not_voted_by(controller.current_user.id)
 end
 ```
 

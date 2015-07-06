@@ -47,6 +47,24 @@ module HasScope
     #
     # * <tt>:allow_blank</tt> - Blank values are not sent to scopes by default. Set to true to overwrite.
     #
+    # * <tt>:in</tt> - A shortcut for combining the :using option with nested hashes.
+    #                  For example, "has_scope xyz, :in => :abc" is the same as
+    #                  "has_scope xyz, :as => :abc, :using => :xyz, :type => :hash",
+    #                  and would make the scope apply when the params are
+    #                  "?abc[xyz]=value".
+    #
+    # * <tt>:if_value</tt> - For string and numeric types, indicates the value
+    #                        that the param must have if the scope should apply.
+    #
+    # * <tt>:unless_value</tt> - For string and numeric types, indicates the
+    #                            value that the param must have if the scope
+    #                            should NOT apply.
+    #
+    # * <tt>:scope_by_value</tt> - A shortcut for combining :as with :if_value
+    #                              set to the scope name. For example,
+    #                              "has_scope xyz, :scope_by_value => :filter"
+    #                              is the same as
+    #                              "has_scope xyz, :as => :filter, :if_value => :xyz"
     # == Block usage
     #
     # has_scope also accepts a block. The controller, current scope and value are yielded
@@ -64,9 +82,19 @@ module HasScope
     def has_scope(*scopes, &block)
       options = scopes.extract_options!
       options.symbolize_keys!
-      options.assert_valid_keys(:type, :only, :except, :if, :unless, :default, :as, :using, :allow_blank, :in)
+      options.assert_valid_keys(
+          :type, :only, :except, :if, :unless, :default, :as, :using,
+          :allow_blank, :in, :if_value, :unless_value, :scope_by_value)
+
+      if options.key?(:scope_by_value)
+        ensure_options_compatible!(:scope_by_value, [:if_value, :as], options)
+
+        options[:as] = options[:scope_by_value]
+      end
 
       if options.key?(:in)
+        ensure_options_compatible!(:in, [:scope_by_value, :as, :using], options)
+
         options[:as] = options[:in]
         options[:using] = scopes
       end
@@ -81,8 +109,10 @@ module HasScope
         options[:using] = Array(options[:using])
       end
 
-      options[:only]   = Array(options[:only])
-      options[:except] = Array(options[:except])
+      options[:only]          = Array(options[:only])
+      options[:except]        = Array(options[:except])
+      options[:if_value]      = Array(options[:if_value])
+      options[:unless_value]  = Array(options[:unless_value])
 
       self.scopes_configuration = scopes_configuration.dup
 
@@ -90,6 +120,16 @@ module HasScope
         scopes_configuration[scope] ||= { :as => scope, :type => :default, :block => block }
         scopes_configuration[scope] = self.scopes_configuration[scope].merge(options)
       end
+    end
+
+    # Checks whether the provided options contain any other options that
+    # conflict with the current option being processed.
+    def ensure_options_compatible!(current_option, incompatible_options, provided_options)
+      incompatible_options.each {|key_name|
+        if provided_options.key?(key_name)
+          raise "You cannot use #{key_name} with #{current_option}"
+        end
+      }
     end
   end
 
@@ -123,7 +163,7 @@ module HasScope
       value = parse_value(options[:type], key, value)
       value = normalize_blanks(value)
 
-      if call_scope && (value.present? || options[:allow_blank])
+      if call_scope && (value.present? || options[:allow_blank]) && value_matches?(scope, value, options)
         current_scopes[key] = value
         target = call_scope_by_type(options[:type], scope, target, value, options)
       end
@@ -190,6 +230,31 @@ module HasScope
       send(string_proc_or_symbol) == expected
     else
       true
+    end
+  end
+
+  # Evaluates the scope options :scope_by_value, :if_value and :unless_value.
+  # Returns true either if none of those options are being used, or if the value
+  # of the options matches the appropriate value from the query string parameter.
+  def value_matches?(scope, value, options)
+    if value && options.key?(:using)
+      value = value.values_at(*options[:using])
+    end
+
+    if options.key?(:scope_by_value)
+      (value.to_sym == scope.to_sym)
+    else
+      result = true
+
+      unless options[:if_value].empty?
+        result = result && options[:if_value].include?(value.to_sym)
+      end
+
+      unless options[:unless_value].empty?
+        result = result && !options[:unless_value].include?(value.to_sym)
+      end
+
+      result
     end
   end
 
