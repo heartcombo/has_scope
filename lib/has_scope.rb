@@ -241,17 +241,21 @@ module HasScope
       value = value.values_at(*options[:using])
     end
 
+    # Only match the first string we're passed, in case caller is using
+    # :using and the value ends up being an array.
+    value_sym = Array(value).first
+
     if options.key?(:scope_by_value)
-      (value.to_sym == scope.to_sym)
+      (value_sym == scope.to_sym)
     else
       result = true
 
       unless options[:if_value].empty?
-        result = result && options[:if_value].include?(value.to_sym)
+        result = result && options[:if_value].include?(value_sym)
       end
 
       unless options[:unless_value].empty?
-        result = result && !options[:unless_value].include?(value.to_sym)
+        result = result && !options[:unless_value].include?(value_sym)
       end
 
       result
