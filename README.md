@@ -12,6 +12,8 @@ class Graduation < ActiveRecord::Base
   scope :featured, -> { where(:featured => true) }
   scope :by_degree, -> degree { where(:degree => degree) }
   scope :by_period, -> started_at, ended_at { where("started_at = ? AND ended_at = ?", started_at, ended_at) }
+  scope :high_gpa, -> { where("gpa > 3") }
+  scope :low_gpa, -> { where("gpa <= 3") }
 end
 ```
 
@@ -21,6 +23,8 @@ You can use those named scopes as filters by declaring them on your controller:
 class GraduationsController < ApplicationController
   has_scope :featured, :type => :boolean
   has_scope :by_degree
+  has_scope :high_gpa, :scope_by_value :gpa
+  has_scope :low_gpa, :scope_by_value :gpa
 end
 ```
 
@@ -52,6 +56,12 @@ Then for each request:
 
 /graduations?featured=true&by_degree=phd
 #=> brings featured graduations with phd degree
+
+/graduations?gpa=high_gpa&by_degree=phd
+#=> brings high GPA phd graduates
+
+/graduations?gpa=low_gpa&by_degree=phd
+#=> brings low GPA phd graduates
 ```
 
 After `apply_scopes` has been called, you can retrieve all the scopes applied in
@@ -104,7 +114,7 @@ HasScope supports several options:
 * `:unless_value` - For string and numeric types, indicates the value that the
                     param must have if the scope should NOT apply.
 
-* `:scope_by_value` - A shortcut for combining :as with :if_value set to the
+* `:scope_by_value` - A shortcut for combining `:as` with `:if_value` set to the
                       scope name. For example,
                       `has_scope xyz, :scope_by_value => :filter`
                       is equivalent to
