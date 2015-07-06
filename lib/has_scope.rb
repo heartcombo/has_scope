@@ -60,11 +60,19 @@ module HasScope
     #                            value that the param must have if the scope
     #                            should NOT apply.
     #
-    # * <tt>:scope_by_value</tt> - A shortcut for combining :as with :if_value
-    #                              set to the scope name. For example,
+    # * <tt>:no_value_passing</tt> - Does not pass the value of the param to the
+    #                                scope. Often used with :if_value and
+    #                                :unless_value if the value is just used to
+    #                                determine which scope is active.
+    #
+    # * <tt>:scope_by_value</tt> - A shortcut for combining :no_value_passing,
+    #                              :as, and :if_value. :as is set to the value
+    #                              provided to this option, and :if_value is set
+    #                              to the scope name.
+    #                              For example,
     #                              "has_scope xyz, :scope_by_value => :filter"
     #                              is the same as
-    #                              "has_scope xyz, :as => :filter, :if_value => :xyz"
+    #                              "has_scope xyz, :as => :filter, :if_value => :xyz, :no_value_passing => true"
     # == Block usage
     #
     # has_scope also accepts a block. The controller, current scope and value are yielded
@@ -84,12 +92,14 @@ module HasScope
       options.symbolize_keys!
       options.assert_valid_keys(
           :type, :only, :except, :if, :unless, :default, :as, :using,
-          :allow_blank, :in, :if_value, :unless_value, :scope_by_value)
+          :allow_blank, :in, :if_value, :unless_value, :scope_by_value,
+          :no_value_passing)
 
       if options.key?(:scope_by_value)
         ensure_options_compatible!(:scope_by_value, [:if_value, :as], options)
 
         options[:as] = options[:scope_by_value]
+        options[:no_value_passing] = true unless options.key?(:no_value_passing)
       end
 
       if options.key?(:in)
@@ -117,7 +127,7 @@ module HasScope
       self.scopes_configuration = scopes_configuration.dup
 
       scopes.each do |scope|
-        scopes_configuration[scope] ||= { :as => scope, :type => :default, :block => block }
+        scopes_configuration[scope] ||= { :as => scope, :type => :default, :block => block, :no_value_passing => false }
         scopes_configuration[scope] = self.scopes_configuration[scope].merge(options)
       end
     end
@@ -196,7 +206,7 @@ module HasScope
   def call_scope_by_type(type, scope, target, value, options) #:nodoc:
     block = options[:block]
 
-    if type == :boolean && !options[:allow_blank]
+    if (type == :boolean && !options[:allow_blank]) || options[:no_value_passing]
       block ? block.call(self, target) : target.send(scope)
     elsif value && options.key?(:using)
       value = value.values_at(*options[:using])

@@ -116,11 +116,17 @@ HasScope supports several options:
 * `:unless_value` - For string and numeric types, indicates the value that the
                     param must have if the scope should NOT apply.
 
-* `:scope_by_value` - A shortcut for combining `:as` with `:if_value` set to the
-                      scope name. For example,
+* `:no_value_passing`  - Does not pass the value of the param to the scope.
+                         Often used with :if_value and :unless_value if the
+                         value is just used to determine which scope is active.
+
+* `:scope_by_value` - A shortcut for combining `:no_value_passing`, `:as`, and
+                      `:if_value`. `:as` is set to the value provided to this
+                      option, and `:if_value` is set to the scope name.
+                      For example,
                       `has_scope xyz, :scope_by_value => :filter`
                       is equivalent to
-                      `has_scope xyz, :as => :filter, :if_value => :xyz`
+                      `has_scope xyz, :as => :filter, :if_value => :xyz, :no_value_passing => true`
 
 ## Boolean usage
 

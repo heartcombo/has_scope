@@ -23,6 +23,7 @@ class TreesController < ApplicationController
   has_scope :shrub, :scope_by_value => :tree_type
   has_scope :sequoia, :scope_by_value => :tree_type
   has_scope :maple, :scope_by_value => :tree_type
+  has_scope :dogwood, :as => :tree_type, :if_value => :dogwood, :no_value_passing => true
 
   has_scope :only_short, :type => :boolean do |controller, scope|
     scope.only_really_short!(controller.object_id)
@@ -344,7 +345,7 @@ class HasScopeTest < ActionController::TestCase
 
   def test_scope_with_scope_by_value_option_shrub
     hash = { :tree_type => 'shrub' }
-    Tree.expects(:shrub).with('shrub').returns(Tree).in_sequence
+    Tree.expects(:shrub).with().returns(Tree).in_sequence
     Tree.expects(:all).returns([mock_tree]).in_sequence
     get :index, hash
     assert_equal([mock_tree], assigns(:trees))
@@ -353,7 +354,16 @@ class HasScopeTest < ActionController::TestCase
 
   def test_scope_with_scope_by_value_option_sequoia
     hash = { :tree_type => 'sequoia' }
-    Tree.expects(:sequoia).with('sequoia').returns(Tree).in_sequence
+    Tree.expects(:sequoia).with().returns(Tree).in_sequence
+    Tree.expects(:all).returns([mock_tree]).in_sequence
+    get :index, hash
+    assert_equal([mock_tree], assigns(:trees))
+    assert_equal(hash, current_scopes)
+  end
+
+  def test_scope_with_no_value_passing
+    hash = { :tree_type => 'dogwood' }
+    Tree.expects(:dogwood).with().returns(Tree).in_sequence
     Tree.expects(:all).returns([mock_tree]).in_sequence
     get :index, hash
     assert_equal([mock_tree], assigns(:trees))
