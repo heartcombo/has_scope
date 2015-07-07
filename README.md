@@ -56,14 +56,14 @@ Then for each request:
 /graduations?by_period[started_at]=20100701&by_period[ended_at]=20101013
 #=> brings graduations in the given period
 
-/graduations?featured=true&by_degree=phd
-#=> brings featured graduations with phd degree
-
 /graduations?gpa=high_gpa&by_degree=phd
 #=> brings high GPA phd graduates
 
 /graduations?gpa=low_gpa&by_degree=phd
 #=> brings low GPA phd graduates
+
+/graduations?featured=true&by_degree=phd
+#=> brings featured graduations with phd degree
 ```
 
 After `apply_scopes` has been called, you can retrieve all the scopes applied in
