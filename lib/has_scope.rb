@@ -256,7 +256,7 @@ module HasScope
     first_value = Array(value).first
 
     if options.key?(:scope_by_value)
-      (first_value.to_sym == scope.to_sym)
+      (first_value.to_sym == scope.to_sym) unless first_value.nil?
     else
       result = true
 
