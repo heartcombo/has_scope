@@ -4,7 +4,7 @@
 [![Build Status](https://api.travis-ci.org/plataformatec/has_scope.png?branch=master)](http://travis-ci.org/plataformatec/has_scope)
 [![Code Climate](https://codeclimate.com/github/plataformatec/has_scope.png)](https://codeclimate.com/github/plataformatec/has_scope)
 
-Has scope allows you to easily create controller filters based on your resources named scopes.
+Has scope allows you to map incoming controller parameters to named scopes in your resources.
 Imagine the following model called graduations:
 
 ```ruby
