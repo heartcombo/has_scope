@@ -2,26 +2,26 @@ PATH
   remote: .
   specs:
     has_scope (0.6.0)
-      actionpack (>= 3.2, < 5)
-      activesupport (>= 3.2, < 5)
+      actionpack (>= 3.2, < 5.1)
+      activesupport (>= 3.2, < 5.1)
 
 GEM
   remote: https://rubygems.org/
   specs:
-    actionpack (4.2.1)
-      actionview (= 4.2.1)
-      activesupport (= 4.2.1)
+    actionpack (4.2.4)
+      actionview (= 4.2.4)
+      activesupport (= 4.2.4)
       rack (~> 1.6)
       rack-test (~> 0.6.2)
       rails-dom-testing (~> 1.0, >= 1.0.5)
-      rails-html-sanitizer (~> 1.0, >= 1.0.1)
-    actionview (4.2.1)
-      activesupport (= 4.2.1)
+      rails-html-sanitizer (~> 1.0, >= 1.0.2)
+    actionview (4.2.4)
+      activesupport (= 4.2.4)
       builder (~> 3.1)
       erubis (~> 2.7.0)
       rails-dom-testing (~> 1.0, >= 1.0.5)
-      rails-html-sanitizer (~> 1.0, >= 1.0.1)
-    activesupport (4.2.1)
+      rails-html-sanitizer (~> 1.0, >= 1.0.2)
+    activesupport (4.2.4)
       i18n (~> 0.7)
       json (~> 1.7, >= 1.7.7)
       minitest (~> 5.1)
@@ -30,22 +30,22 @@ GEM
     builder (3.2.2)
     erubis (2.7.0)
     i18n (0.7.0)
-    json (1.8.2)
-    loofah (2.0.1)
+    json (1.8.3)
+    loofah (2.0.3)
       nokogiri (>= 1.5.9)
     metaclass (0.0.4)
     mini_portile (0.6.2)
-    minitest (5.5.1)
+    minitest (5.8.2)
     mocha (1.0.0)
       metaclass (~> 0.0.1)
     nokogiri (1.6.6.2)
       mini_portile (~> 0.6.0)
-    rack (1.6.0)
+    rack (1.6.4)
     rack-test (0.6.3)
       rack (>= 1.0)
     rails-deprecated_sanitizer (1.0.3)
       activesupport (>= 4.2.0.alpha)
-    rails-dom-testing (1.0.6)
+    rails-dom-testing (1.0.7)
       activesupport (>= 4.2.0.beta, < 5.0)
       nokogiri (~> 1.6.0)
       rails-deprecated_sanitizer (>= 1.0.1)
@@ -65,3 +65,6 @@ DEPENDENCIES
   has_scope!
   mocha (~> 1.0.0)
   rake
+
+BUNDLED WITH
+   1.10.6

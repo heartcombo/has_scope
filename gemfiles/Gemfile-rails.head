@@ -1,0 +1,9 @@
+source 'https://rubygems.org'
+
+gemspec path: '..'
+
+gem 'actionpack', github: 'rails/rails'
+gem 'activesupport', github: 'rails/rails'
+gem 'mocha', '~> 1.0.0', require: false
+gem 'rack', github: 'rack/rack'
+gem 'rake'
