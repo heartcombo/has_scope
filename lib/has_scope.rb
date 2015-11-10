@@ -3,7 +3,7 @@ module HasScope
 
   ALLOWED_TYPES = {
     :array   => [[ Array ]],
-    :hash    => [[ Hash ]],
+    :hash    => [[Hash, ActionController::Parameters]],
     :boolean => [[ Object ], -> v { TRUE_VALUES.include?(v) }],
     :default => [[ String, Numeric ]],
   }
@@ -147,6 +147,8 @@ module HasScope
       value.select { |v| v.present? }
     when Hash
       value.select { |k, v| normalize_blanks(v).present? }.with_indifferent_access
+    when ActionController::Parameters
+      value.select { |k, v| normalize_blanks(v).present? }.to_unsafe_h.with_indifferent_access
     else
       value
     end
@@ -201,5 +203,5 @@ end
 
 ActiveSupport.on_load :action_controller do
   include HasScope
-  helper_method :current_scopes
+  helper_method :current_scopes if respond_to?(:helper_method)
 end

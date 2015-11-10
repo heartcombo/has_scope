@@ -38,6 +38,7 @@ class TreesController < ApplicationController
   def show
     @tree = apply_scopes(Tree).find(params[:id])
   end
+
   alias :edit :show
 
   protected
@@ -49,8 +50,15 @@ class TreesController < ApplicationController
       false
     end
 
-    def default_render
-      render :text => action_name
+    if ActionPack::VERSION::MAJOR == 5
+      def default_render
+        render body: action_name
+      end
+    else
+      # TODO: Remove this when we only support Rails 5.
+      def default_render
+        render text: action_name
+      end
     end
 end
 
@@ -70,7 +78,7 @@ class HasScopeTest < ActionController::TestCase
     Tree.expects(:only_tall).with().returns(Tree).in_sequence
     Tree.expects(:all).returns([mock_tree]).in_sequence
     get :index, :only_tall => 'true'
-    assert_equal([mock_tree], assigns(:trees))
+    assert_equal([mock_tree], assigns(:@trees))
     assert_equal({ :only_tall => true }, current_scopes)
   end
 
@@ -78,7 +86,7 @@ class HasScopeTest < ActionController::TestCase
     Tree.expects(:only_tall).never
     Tree.expects(:all).returns([mock_tree])
     get :index, :only_tall => 'false'
-    assert_equal([mock_tree], assigns(:trees))
+    assert_equal([mock_tree], assigns(:@trees))
     assert_equal({ }, current_scopes)
   end
 
@@ -86,7 +94,7 @@ class HasScopeTest < ActionController::TestCase
     Tree.expects(:conifer).with(true).returns(Tree).in_sequence
     Tree.expects(:all).returns([mock_tree]).in_sequence
     get :index, :conifer => 'true'
-    assert_equal([mock_tree], assigns(:trees))
+    assert_equal([mock_tree], assigns(:@trees))
     assert_equal({ :conifer => true }, current_scopes)
   end
 
@@ -94,7 +102,7 @@ class HasScopeTest < ActionController::TestCase
     Tree.expects(:conifer).with(false).returns(Tree).in_sequence
     Tree.expects(:all).returns([mock_tree]).in_sequence
     get :index, :conifer => 'not_true'
-    assert_equal([mock_tree], assigns(:trees))
+    assert_equal([mock_tree], assigns(:@trees))
     assert_equal({ :conifer => false }, current_scopes)
   end
 
@@ -102,7 +110,7 @@ class HasScopeTest < ActionController::TestCase
     Tree.expects(:conifer).never
     Tree.expects(:all).returns([mock_tree])
     get :index
-    assert_equal([mock_tree], assigns(:trees))
+    assert_equal([mock_tree], assigns(:@trees))
     assert_equal({ }, current_scopes)
   end
 
@@ -110,7 +118,7 @@ class HasScopeTest < ActionController::TestCase
     Tree.expects(:only_tall).never
     Tree.expects(:find).with('42').returns(mock_tree)
     get :show, :only_tall => 'true', :id => '42'
-    assert_equal(mock_tree, assigns(:tree))
+    assert_equal(mock_tree, assigns(:@tree))
     assert_equal({ }, current_scopes)
   end
 
@@ -119,7 +127,7 @@ class HasScopeTest < ActionController::TestCase
     Tree.expects(:only_tall).never
     Tree.expects(:all).returns([mock_tree])
     get :index, :only_tall => 'true'
-    assert_equal([mock_tree], assigns(:trees))
+    assert_equal([mock_tree], assigns(:@trees))
     assert_equal({ }, current_scopes)
   end
 
@@ -128,7 +136,7 @@ class HasScopeTest < ActionController::TestCase
     Tree.expects(:color).never
     Tree.expects(:all).returns([mock_tree])
     get :index, :color => 'blue'
-    assert_equal([mock_tree], assigns(:trees))
+    assert_equal([mock_tree], assigns(:@trees))
     assert_equal({ }, current_scopes)
   end
 
@@ -136,7 +144,7 @@ class HasScopeTest < ActionController::TestCase
     Tree.expects(:shadown_range).never
     Tree.expects(:all).returns([mock_tree])
     get :index, :shadown_range => 20
-    assert_equal([mock_tree], assigns(:trees))
+    assert_equal([mock_tree], assigns(:@trees))
     assert_equal({ }, current_scopes)
   end
 
@@ -144,7 +152,7 @@ class HasScopeTest < ActionController::TestCase
     Tree.expects(:color).with('blue').returns(Tree).in_sequence
     Tree.expects(:all).returns([mock_tree]).in_sequence
     get :index, :color => 'blue'
-    assert_equal([mock_tree], assigns(:trees))
+    assert_equal([mock_tree], assigns(:@trees))
     assert_equal({ :color => 'blue' }, current_scopes)
   end
 
@@ -152,7 +160,7 @@ class HasScopeTest < ActionController::TestCase
     Tree.expects(:color).never
     Tree.expects(:all).returns([mock_tree]).in_sequence
     get :index, :color => ''
-    assert_equal([mock_tree], assigns(:trees))
+    assert_equal([mock_tree], assigns(:@trees))
     assert_equal({ }, current_scopes)
   end
 
@@ -160,7 +168,7 @@ class HasScopeTest < ActionController::TestCase
     Tree.expects(:root_type).with('').returns(Tree)
     Tree.expects(:all).returns([mock_tree]).in_sequence
     get :index, :root => ''
-    assert_equal([mock_tree], assigns(:trees))
+    assert_equal([mock_tree], assigns(:@trees))
     assert_equal({ :root => '' }, current_scopes)
   end
 
@@ -169,7 +177,7 @@ class HasScopeTest < ActionController::TestCase
     Tree.expects(:color).with('blue').returns(Tree)
     Tree.expects(:all).returns([mock_tree])
     get :index, :color => 'blue', :only_tall => 'true'
-    assert_equal([mock_tree], assigns(:trees))
+    assert_equal([mock_tree], assigns(:@trees))
     assert_equal({ :color => 'blue', :only_tall => true }, current_scopes)
   end
 
@@ -178,8 +186,8 @@ class HasScopeTest < ActionController::TestCase
     Tree.expects(:paginate).with(hash).returns(Tree)
     Tree.expects(:all).returns([mock_tree])
     get :index, :paginate => hash
-    assert_equal([mock_tree], assigns(:trees))
-    assert_equal({ :paginate => hash }, current_scopes)
+    assert_equal([mock_tree], assigns(:@trees))
+    assert_equal({ paginate: hash }, current_scopes)
   end
 
   def test_scope_of_type_hash_with_using
@@ -187,7 +195,7 @@ class HasScopeTest < ActionController::TestCase
     Tree.expects(:args_paginate).with("1", "10").returns(Tree)
     Tree.expects(:all).returns([mock_tree])
     get :index, :args_paginate => hash
-    assert_equal([mock_tree], assigns(:trees))
+    assert_equal([mock_tree], assigns(:@trees))
     assert_equal({ :args_paginate => hash }, current_scopes)
   end
 
@@ -196,7 +204,7 @@ class HasScopeTest < ActionController::TestCase
     Tree.expects(:paginate).never
     Tree.expects(:all).returns([mock_tree])
     get :index, :paginate => hash
-    assert_equal([mock_tree], assigns(:trees))
+    assert_equal([mock_tree], assigns(:@trees))
     assert_equal({ }, current_scopes)
   end
 
@@ -205,7 +213,7 @@ class HasScopeTest < ActionController::TestCase
     Tree.expects(:paginate).never
     Tree.expects(:all).returns([mock_tree])
     get :index, :paginate => hash
-    assert_equal([mock_tree], assigns(:trees))
+    assert_equal([mock_tree], assigns(:@trees))
     assert_equal({ }, current_scopes)
   end
 
@@ -214,7 +222,7 @@ class HasScopeTest < ActionController::TestCase
     Tree.expects(:paginate).never
     Tree.expects(:all).returns([mock_tree])
     get :index, :paginate => hash
-    assert_equal([mock_tree], assigns(:trees))
+    assert_equal([mock_tree], assigns(:@trees))
     assert_equal({ }, current_scopes)
   end
 
@@ -223,7 +231,7 @@ class HasScopeTest < ActionController::TestCase
     Tree.expects(:categories).with(array).returns(Tree)
     Tree.expects(:all).returns([mock_tree])
     get :index, :categories => array
-    assert_equal([mock_tree], assigns(:trees))
+    assert_equal([mock_tree], assigns(:@trees))
     assert_equal({ :categories => array }, current_scopes)
   end
 
@@ -231,14 +239,14 @@ class HasScopeTest < ActionController::TestCase
     Tree.expects(:categories).never
     Tree.expects(:all).returns([mock_tree])
     get :index, :categories => [""]
-    assert_equal([mock_tree], assigns(:trees))
+    assert_equal([mock_tree], assigns(:@trees))
     assert_equal({ }, current_scopes)
   end
 
   def test_scope_of_invalid_type_silently_fails
     Tree.expects(:all).returns([mock_tree])
     get :index, :paginate => "1"
-    assert_equal([mock_tree], assigns(:trees))
+    assert_equal([mock_tree], assigns(:@trees))
     assert_equal({ }, current_scopes)
   end
 
@@ -246,7 +254,7 @@ class HasScopeTest < ActionController::TestCase
     Tree.expects(:shadown_range).with(10).returns(Tree).in_sequence
     Tree.expects(:find).with('42').returns(mock_tree).in_sequence
     get :edit, :id => '42'
-    assert_equal(mock_tree, assigns(:tree))
+    assert_equal(mock_tree, assigns(:@tree))
     assert_equal({ :shadown_range => 10 }, current_scopes)
   end
 
@@ -254,7 +262,7 @@ class HasScopeTest < ActionController::TestCase
     Tree.expects(:shadown_range).with('20').returns(Tree).in_sequence
     Tree.expects(:find).with('42').returns(mock_tree).in_sequence
     get :edit, :id => '42', :shadown_range => '20'
-    assert_equal(mock_tree, assigns(:tree))
+    assert_equal(mock_tree, assigns(:@tree))
     assert_equal({ :shadown_range => '20' }, current_scopes)
   end
 
@@ -262,7 +270,7 @@ class HasScopeTest < ActionController::TestCase
     Tree.expects(:root_type).with('outside').returns(Tree).in_sequence
     Tree.expects(:find).with('42').returns(mock_tree).in_sequence
     get :show, :id => '42', :root => 'outside'
-    assert_equal(mock_tree, assigns(:tree))
+    assert_equal(mock_tree, assigns(:@tree))
     assert_equal({ :root => 'outside' }, current_scopes)
   end
 
@@ -271,7 +279,7 @@ class HasScopeTest < ActionController::TestCase
     Tree.expects(:planted_before).with("today").returns(Tree)
     Tree.expects(:all).returns([mock_tree])
     get :index
-    assert_equal([mock_tree], assigns(:trees))
+    assert_equal([mock_tree], assigns(:@trees))
     assert_equal({ :planted_before => "today" }, current_scopes)
   end
 
@@ -280,7 +288,7 @@ class HasScopeTest < ActionController::TestCase
     Tree.expects(:calculate_height).with(100).returns(Tree).in_sequence
     Tree.expects(:new).returns(mock_tree).in_sequence
     get :new
-    assert_equal(mock_tree, assigns(:tree))
+    assert_equal(mock_tree, assigns(:@tree))
     assert_equal({ :calculate_height => 100 }, current_scopes)
   end
 
@@ -289,7 +297,7 @@ class HasScopeTest < ActionController::TestCase
     Tree.expects(:planted_after).with(parsed).returns(Tree)
     Tree.expects(:all).returns([mock_tree])
     get :index, :planted_after => "2014-11-11"
-    assert_equal([mock_tree], assigns(:trees))
+    assert_equal([mock_tree], assigns(:@trees))
     assert_equal({ :planted_after => parsed }, current_scopes)
   end
 
@@ -297,7 +305,7 @@ class HasScopeTest < ActionController::TestCase
     Tree.expects(:only_really_short!).with(@controller.object_id).returns(Tree)
     Tree.expects(:all).returns([mock_tree])
     get :index, :only_short => 'true'
-    assert_equal([mock_tree], assigns(:trees))
+    assert_equal([mock_tree], assigns(:@trees))
     assert_equal({ :only_short => true }, current_scopes)
   end
 
@@ -305,7 +313,7 @@ class HasScopeTest < ActionController::TestCase
     Tree.expects(:by_given_category).with(@controller.object_id, 'for_id').returns(Tree)
     Tree.expects(:all).returns([mock_tree])
     get :index, :by_category => 'for'
-    assert_equal([mock_tree], assigns(:trees))
+    assert_equal([mock_tree], assigns(:@trees))
     assert_equal({ :by_category => 'for' }, current_scopes)
   end
 
@@ -314,9 +322,9 @@ class HasScopeTest < ActionController::TestCase
     Tree.expects(:title).with('the-title').returns(Tree)
     Tree.expects(:content).with('the-content').returns(Tree)
     Tree.expects(:all).returns([mock_tree])
-    get :index, :q => hash
-    assert_equal([mock_tree], assigns(:trees))
-    assert_equal({ :q => hash }, current_scopes)
+    get :index, q: hash
+    assert_equal([mock_tree], assigns(:@trees))
+    assert_equal({ q: hash }, current_scopes)
   end
 
   def test_overwritten_scope
@@ -326,12 +334,23 @@ class HasScopeTest < ActionController::TestCase
 
   protected
 
+    if ActionPack::VERSION::MAJOR == 5
+      # TODO: Remove this when we only support Rails 5.
+      def get(action, params = {})
+        super action, params: params
+      end
+    end
+
     def mock_tree(stubs={})
       @mock_tree ||= mock(stubs)
     end
 
     def current_scopes
       @controller.send :current_scopes
+    end
+
+    def assigns(ivar)
+      @controller.instance_variable_get(ivar)
     end
 end
 

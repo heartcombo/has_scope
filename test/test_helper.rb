@@ -8,6 +8,7 @@ require 'mocha/mini_test'
 ENV['RAILS_ENV'] = 'test'
 
 require 'active_support'
+require 'active_support/core_ext/string/strip'
 require 'action_controller'
 require 'action_dispatch/middleware/flash'
 
