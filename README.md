@@ -131,6 +131,20 @@ has_scope :not_voted_by_me, :type => :boolean do |controller, scope|
 end
 ```
 
+## Keyword arguments
+
+Scopes with keyword arguments need to be called in a block:
+
+```ruby
+# in the model
+scope :for_course, lambda { |course_id:| where(course_id: course_id) }
+
+# in the controller
+has_scope :for_course do |controller, scope, value|
+  scope.for_course(course_id: value)
+end
+```
+
 ## Apply scope on every request
 
 To apply scope on every request set default value and `allow_blank: true`:
