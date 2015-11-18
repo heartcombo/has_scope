@@ -148,7 +148,7 @@ module HasScope
     when Hash
       value.select { |k, v| normalize_blanks(v).present? }.with_indifferent_access
     when ActionController::Parameters
-      value.select { |k, v| normalize_blanks(v).present? }.to_unsafe_h.with_indifferent_access
+      normalize_blanks(value.to_unsafe_h)
     else
       value
     end
