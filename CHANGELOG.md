@@ -1,3 +1,8 @@
+## 0.7.0
+
+* Added support Rails 5.
+* Removed support for Rails `3.2` and `4.0` and Ruby `1.9.3` and `2.0.0`.
+
 ## 0.6.0
 
 * Allow custom types and parsers
