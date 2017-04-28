@@ -2,8 +2,8 @@ PATH
   remote: .
   specs:
     has_scope (0.7.0)
-      actionpack (>= 4.1, < 5.1)
-      activesupport (>= 4.1, < 5.1)
+      actionpack (>= 4.1, < 5.2)
+      activesupport (>= 4.1, < 5.2)
 
 GEM
   remote: https://rubygems.org/
@@ -67,4 +67,4 @@ DEPENDENCIES
   rake
 
 BUNDLED WITH
-   1.10.6
+   1.14.6
