@@ -1,5 +1,5 @@
 module HasScope
-  TRUE_VALUES = ["true", true, "1", 1]
+  TRUE_VALUES = ["on", "true", true, "1", 1]
 
   ALLOWED_TYPES = {
     :array   => [[ Array ]],
