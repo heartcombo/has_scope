@@ -137,7 +137,7 @@ Scopes with keyword arguments need to be called in a block:
 
 ```ruby
 # in the model
-scope :for_course, lambda { |course_id:| where(course_id: course_id) }
+scope :for_course, lambda { |course_id| where(course_id: course_id) }
 
 # in the controller
 has_scope :for_course do |controller, scope, value|
