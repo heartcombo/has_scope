@@ -12,6 +12,8 @@ class Graduation < ActiveRecord::Base
   scope :featured, -> { where(:featured => true) }
   scope :by_degree, -> degree { where(:degree => degree) }
   scope :by_period, -> started_at, ended_at { where("started_at = ? AND ended_at = ?", started_at, ended_at) }
+  scope :high_gpa, -> { where("gpa > 3") }
+  scope :low_gpa, -> { where("gpa <= 3") }
 end
 ```
 
@@ -21,6 +23,8 @@ You can use those named scopes as filters by declaring them on your controller:
 class GraduationsController < ApplicationController
   has_scope :featured, :type => :boolean
   has_scope :by_degree
+  has_scope :high_gpa, :scope_by_value :gpa
+  has_scope :low_gpa, :scope_by_value :gpa
 end
 ```
 
@@ -31,6 +35,8 @@ class GraduationsController < ApplicationController
   has_scope :featured, :type => :boolean
   has_scope :by_degree
   has_scope :by_period, :using => [:started_at, :ended_at], :type => :hash
+  has_scope :high_gpa, :scope_by_value :gpa
+  has_scope :low_gpa, :scope_by_value :gpa
 
   def index
     @graduations = apply_scopes(Graduation).all
@@ -50,12 +56,20 @@ Then for each request:
 /graduations?by_period[started_at]=20100701&by_period[ended_at]=20101013
 #=> brings graduations in the given period
 
+/graduations?gpa=high_gpa&by_degree=phd
+#=> brings high GPA phd graduates
+
+/graduations?gpa=low_gpa&by_degree=phd
+#=> brings low GPA phd graduates
+
 /graduations?featured=true&by_degree=phd
 #=> brings featured graduations with phd degree
 ```
 
-You can retrieve all the scopes applied in one action with `current_scopes` method.
-In the last case, it would return: { :featured => true, :by_degree => "phd" }.
+After `apply_scopes` has been called, you can retrieve all the scopes applied in
+one action with `current_scopes` method.
+
+In the last case, it would return: `{ :featured => true, :by_degree => "phd" }`.
 
 ## Installation
 
@@ -92,6 +106,27 @@ HasScope supports several options:
 * `:allow_blank` - Blank values are not sent to scopes by default. Set to true to overwrite.
 
 * `:in` - A shortcut for combining the `:using` option with nested hashes.
+          For example, `has_scope xyz, :in => :abc` is the same as
+          `has_scope xyz, :as => :abc, :using => :xyz, :type => :hash`, and
+          would make the scope apply when the params are "?abc[xyz]=value".
+
+* `:if_value` - For string and numeric types, indicates the value that the param
+                must have if the scope should apply.
+
+* `:unless_value` - For string and numeric types, indicates the value that the
+                    param must have if the scope should NOT apply.
+
+* `:no_value_passing`  - Does not pass the value of the param to the scope.
+                         Often used with :if_value and :unless_value if the
+                         value is just used to determine which scope is active.
+
+* `:scope_by_value` - A shortcut for combining `:no_value_passing`, `:as`, and
+                      `:if_value`. `:as` is set to the value provided to this
+                      option, and `:if_value` is set to the scope name.
+                      For example,
+                      `has_scope xyz, :scope_by_value => :filter`
+                      is equivalent to
+                      `has_scope xyz, :as => :filter, :if_value => :xyz, :no_value_passing => true`
 
 ## Boolean usage
 
@@ -117,17 +152,21 @@ to the block so the user can apply the scope on its own. This is useful in case 
 need to manipulate the given value:
 
 ```ruby
-has_scope :category do |controller, scope, value|
-  value != "all" ? scope.by_category(value) : scope
+has_scope :category do |controller, target, value|
+  value != "all" ? target.by_category(value) : target
 end
 ```
+
+The `target` argument is the object that was passed to `apply_scopes`, with
+prior scopes applied. The block should either apply one or more scopes, or
+return the target unmodified.
 
 When used with booleans without `:allow_blank`, it just receives two arguments
 and is just invoked if true is given:
 
 ```ruby
-has_scope :not_voted_by_me, :type => :boolean do |controller, scope|
-  scope.not_voted_by(controller.current_user.id)
+has_scope :not_voted_by_me, :type => :boolean do |controller, target|
+  target.not_voted_by(controller.current_user.id)
 end
 ```
 
