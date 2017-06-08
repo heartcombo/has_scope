@@ -1,8 +1,8 @@
 ## HasScope
 
-[![Gem Version](https://fury-badge.herokuapp.com/rb/has_scope.png)](http://badge.fury.io/rb/has_scope)
-[![Build Status](https://api.travis-ci.org/plataformatec/has_scope.png?branch=master)](http://travis-ci.org/plataformatec/has_scope)
-[![Code Climate](https://codeclimate.com/github/plataformatec/has_scope.png)](https://codeclimate.com/github/plataformatec/has_scope)
+[![Gem Version](https://fury-badge.herokuapp.com/rb/has_scope.svg)](http://badge.fury.io/rb/has_scope)
+[![Build Status](https://api.travis-ci.org/plataformatec/has_scope.svg?branch=master)](http://travis-ci.org/plataformatec/has_scope)
+[![Code Climate](https://codeclimate.com/github/plataformatec/has_scope.svg)](https://codeclimate.com/github/plataformatec/has_scope)
 
 Has scope allows you to map incoming controller parameters to named scopes in your resources.
 Imagine the following model called graduations:
