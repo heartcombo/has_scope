@@ -159,12 +159,12 @@ module HasScope
     block = options[:block]
 
     if type == :boolean && !options[:allow_blank]
-      block ? block.call(self, target) : target.send(scope)
+      block ? block.call(self, target) : target.respond_to?(scope) ? target.send(scope) : target
     elsif value && options.key?(:using)
       value = value.values_at(*options[:using])
-      block ? block.call(self, target, value) : target.send(scope, *value)
+      block ? block.call(self, target, value) : target.respond_to?(scope) ? target.send(scope, *value) : target
     else
-      block ? block.call(self, target, value) : target.send(scope, value)
+      block ? block.call(self, target, value) : target.respond_to?(scope) ? target.send(scope, value) : target
     end
   end
 
