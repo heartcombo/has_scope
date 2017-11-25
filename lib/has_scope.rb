@@ -88,18 +88,19 @@ module HasScope
       self.scopes_configuration = scopes_configuration.dup
 
       scopes.each do |scope|
-        scopes_configuration[scope] ||= { :as => scope, :type => :default, :block => block }
-        scopes_configuration[scope] = self.scopes_configuration[scope].merge(options)
+        scope_key = {scope: scope, model: self.scopes_model_class}
+        scopes_configuration[scope_key] ||= { :as => scope, :type => :default, :block => block }
+        scopes_configuration[scope_key] = self.scopes_configuration[scope_key].merge(options)
       end
     end
-  end
 
-  def with_scope_model(model_class, &block)
-    self.scopes_model_class = model_class
-  
-    class_eval &block
-  
-    self.scopes_model_class = nil
+    def with_scope_model(model_class, &block)
+      self.scopes_model_class = model_class
+
+      class_eval &block
+
+      self.scopes_model_class = nil
+    end
   end
 
   protected
@@ -117,9 +118,12 @@ module HasScope
   #
   def apply_scopes(target, hash=params)
     return target unless scopes_configuration
-    return target unless !self.scopes_model_class || target <= self.scopes_model_class
 
-    scopes_configuration.each do |scope, options|
+    scopes_configuration.each do |scope_key, options|
+      scope = scope_key[:scope]
+      model = scope_key[:model]
+      next unless !model || target <= model
+
       next unless apply_scope_to_action?(options)
       key = options[:as]
 

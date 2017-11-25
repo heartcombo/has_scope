@@ -3,6 +3,39 @@ require 'test_helper'
 HasScope::ALLOWED_TYPES[:date] = [[String], -> v { Date.parse(v) rescue nil }]
 
 class Tree; end
+class Flower; end
+
+class GardenController < ApplicationController
+  has_scope :origin
+
+  with_scope_model Tree do
+    has_scope :color
+    has_scope :only_tall, :type => :boolean
+  end
+
+  with_scope_model Flower do
+    has_scope :color
+    has_scope :only_small, :type => :boolean
+  end
+
+  def index
+    @trees = apply_scopes(Tree).all
+    @flowers = apply_scopes(Flower).all
+  end
+
+  protected
+
+    if ActionPack::VERSION::MAJOR == 5
+      def default_render
+        render body: action_name
+      end
+    else
+      # TODO: Remove this when we only support Rails 5.
+      def default_render
+        render text: action_name
+      end
+    end
+end
 
 class TreesController < ApplicationController
   has_scope :color, :unless => :show_all_colors?
@@ -68,6 +101,62 @@ class BonsaisController < TreesController
   protected
     def categories?
       false
+    end
+end
+
+
+class WithScopeModelTest < ActionController::TestCase
+  tests GardenController
+
+  def test_unqualifed_scopes_called_on_all_models
+    Tree.expects(:origin).with("China").returns(Tree).in_sequence
+    Flower.expects(:origin).with("China").returns(Flower).in_sequence
+    Tree.expects(:all).returns([mock_tree]).in_sequence
+    Flower.expects(:all).returns([mock_flower]).in_sequence
+    get :index, :origin => 'China'
+    assert_equal([mock_tree], assigns(:@trees))
+    assert_equal([mock_flower], assigns(:@flowers))
+    assert_equal({ :origin => "China" }, current_scopes)
+  end
+
+  def test_qualified_scopes_in_all_models_called_on_all_models
+    Tree.expects(:color).with('blue').returns(Tree).in_sequence
+    Flower.expects(:color).with('blue').returns(Flower).in_sequence
+    Tree.expects(:all).returns([mock_tree]).in_sequence
+    Flower.expects(:all).returns([mock_flower]).in_sequence
+    get :index, :color => 'blue'
+    assert_equal([mock_tree], assigns(:@trees))
+    assert_equal([mock_flower], assigns(:@flowers))
+    assert_equal({ :color => 'blue' }, current_scopes)
+  end
+
+  def test_qualified_scopes_on_single_model_called_on_single_model
+    Tree.expects(:only_tall).with().returns(Tree).in_sequence
+    Flower.expects(:only_tall).never
+    Tree.expects(:all).returns([mock_tree]).in_sequence
+    Flower.expects(:all).returns([mock_flower]).in_sequence
+    get :index, :only_tall => true
+    assert_equal([mock_tree], assigns(:@trees))
+    assert_equal([mock_flower], assigns(:@flowers))
+    assert_equal({ :only_tall => true }, current_scopes)
+  end
+
+  protected
+
+    def mock_tree(stubs={})
+      @mock_tree ||= mock(stubs)
+    end
+
+    def mock_flower(stubs={})
+      @mock_flower ||= mock(stubs)
+    end
+
+    def current_scopes
+      @controller.send :current_scopes
+    end
+
+    def assigns(ivar)
+      @controller.instance_variable_get(ivar)
     end
 end
 
@@ -328,8 +417,8 @@ class HasScopeTest < ActionController::TestCase
   end
 
   def test_overwritten_scope
-    assert_nil(TreesController.scopes_configuration[:categories][:if])
-    assert_equal(:categories?, BonsaisController.scopes_configuration[:categories][:if])
+    assert_nil(TreesController.scopes_configuration[{scope: :categories, model: nil}][:if])
+    assert_equal(:categories?, BonsaisController.scopes_configuration[{scope: :categories, model: nil}][:if])
   end
 
   protected
