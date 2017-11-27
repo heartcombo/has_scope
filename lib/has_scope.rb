@@ -88,6 +88,9 @@ module HasScope
       self.scopes_configuration = scopes_configuration.dup
 
       scopes.each do |scope|
+        # When `with_scope_model` is used the scopes should only apply to a single model. Otherwise,
+        # the scope will apply to all models. To isolate scopes by model the scope_key combines the
+        # the name of the scope and the model it applies to, or nil if it applies to all models.
         scope_key = {scope: scope, model: self.scopes_model_class}
         scopes_configuration[scope_key] ||= { :as => scope, :type => :default, :block => block }
         scopes_configuration[scope_key] = self.scopes_configuration[scope_key].merge(options)
