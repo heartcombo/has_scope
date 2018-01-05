@@ -23,6 +23,9 @@ matrix:
     - rvm: 2.1.10
       gemfile: gemfiles/rails_5.2.gemfile
 
+before_install:
+    - gem update --system
+
 notifications:
   email: false
   slack:
