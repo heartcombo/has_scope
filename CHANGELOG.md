@@ -1,3 +1,7 @@
+## 0.7.2
+
+* Added support Rails 5.2.
+
 ## 0.7.1
 
 * Added support Rails 5.1.
