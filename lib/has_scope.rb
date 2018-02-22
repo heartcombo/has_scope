@@ -12,6 +12,7 @@ module HasScope
     base.class_eval do
       extend ClassMethods
       class_attribute :scopes_configuration, :instance_writer => false
+      class_attribute :scopes_model_class, :instance_writer => false
       self.scopes_configuration = {}
     end
   end
@@ -91,6 +92,12 @@ module HasScope
         scopes_configuration[scope] = self.scopes_configuration[scope].merge(options)
       end
     end
+
+    def with_scope_model(model_class, &block)
+      self.scopes_model_class = model_class
+      class_eval(&block)
+      self.scopes_model_class = nil
+    end
   end
 
   protected
@@ -107,6 +114,7 @@ module HasScope
   #   end
   #
   def apply_scopes(target, hash=params)
+    return target unless !self.scopes_model_class || target <= self.scopes_model_class
     scopes_configuration.each do |scope, options|
       next unless apply_scope_to_action?(options)
       key = options[:as]
@@ -157,6 +165,10 @@ module HasScope
   # Call the scope taking into account its type.
   def call_scope_by_type(type, scope, target, value, options) #:nodoc:
     block = options[:block]
+
+    if !block && !target.respond_to?(scope)
+      return target
+    end
 
     if type == :boolean && !options[:allow_blank]
       block ? block.call(self, target) : target.send(scope)
