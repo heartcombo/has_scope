@@ -2,8 +2,8 @@ PATH
   remote: .
   specs:
     has_scope (0.7.1)
-      actionpack (>= 4.1, < 6.0)
-      activesupport (>= 4.1, < 6.0)
+      actionpack (>= 4.1)
+      activesupport (>= 4.1)
 
 GEM
   remote: https://rubygems.org/
