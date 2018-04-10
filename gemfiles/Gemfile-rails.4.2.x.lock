@@ -30,7 +30,7 @@ GEM
     builder (3.2.2)
     erubis (2.7.0)
     i18n (0.7.0)
-    json (1.8.3)
+    json (1.8.6)
     loofah (2.0.3)
       nokogiri (>= 1.5.9)
     metaclass (0.0.4)

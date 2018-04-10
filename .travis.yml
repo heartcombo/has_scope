@@ -3,6 +3,8 @@ sudo: false
 rvm:
   - 2.1
   - 2.2
+  - 2.3
+  - 2.4
 gemfile:
   - gemfiles/Gemfile-rails.4.1.x
   - gemfiles/Gemfile-rails.4.2.x
