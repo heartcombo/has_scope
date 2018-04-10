@@ -26,6 +26,7 @@ matrix:
 
 before_install:
     - gem update --system
+    - rm Gemfile.lock
 
 notifications:
   email: false
