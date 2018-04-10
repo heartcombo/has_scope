@@ -7,6 +7,9 @@ gemfile:
   - gemfiles/Gemfile-rails.4.1.x
   - gemfiles/Gemfile-rails.4.2.x
   - gemfiles/Gemfile-rails.head
+matrix:
+  allow_failures:
+    - gemfile: gemfiles/Gemfile-rails.head
 notifications:
   email: false
   slack:
