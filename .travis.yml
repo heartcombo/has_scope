@@ -9,11 +9,14 @@ gemfile:
   - gemfiles/Gemfile-rails.4.1.x
   - gemfiles/Gemfile-rails.4.2.x
   - gemfiles/Gemfile-rails.5.1.x
+  - gemfiles/Gemfile-rails.5.2.x
   - gemfiles/Gemfile-rails.head
 matrix:
   exclude:
     - rvm: 2.1
       gemfile: gemfiles/Gemfile-rails.5.1.x
+    - rvm: 2.1
+      gemfile: gemfiles/Gemfile-rails.5.2.x
   allow_failures:
     - gemfile: gemfiles/Gemfile-rails.head
 notifications:
