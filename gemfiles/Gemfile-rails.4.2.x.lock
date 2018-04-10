@@ -1,5 +1,5 @@
 PATH
-  remote: .
+  remote: ..
   specs:
     has_scope (0.7.1)
       actionpack (>= 4.1, < 5.2)
