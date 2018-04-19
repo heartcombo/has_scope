@@ -9,8 +9,8 @@ Imagine the following model called graduations:
 
 ```ruby
 class Graduation < ActiveRecord::Base
-  scope :featured, -> { where(:featured => true) }
-  scope :by_degree, -> degree { where(:degree => degree) }
+  scope :featured, -> { where(featured: true) }
+  scope :by_degree, -> degree { where(degree: degree) }
   scope :by_period, -> started_at, ended_at { where("started_at = ? AND ended_at = ?", started_at, ended_at) }
 end
 ```
@@ -19,7 +19,7 @@ You can use those named scopes as filters by declaring them on your controller:
 
 ```ruby
 class GraduationsController < ApplicationController
-  has_scope :featured, :type => :boolean
+  has_scope :featured, type: :boolean
   has_scope :by_degree
 end
 ```
@@ -28,9 +28,9 @@ Now, if you want to apply them to an specific resource, you just need to call `a
 
 ```ruby
 class GraduationsController < ApplicationController
-  has_scope :featured, :type => :boolean
+  has_scope :featured, type: :boolean
   has_scope :by_degree
-  has_scope :by_period, :using => [:started_at, :ended_at], :type => :hash
+  has_scope :by_period, using: %i[started_at ended_at], type: :hash
 
   def index
     @graduations = apply_scopes(Graduation).all
@@ -55,7 +55,7 @@ Then for each request:
 ```
 
 You can retrieve all the scopes applied in one action with `current_scopes` method.
-In the last case, it would return: { :featured => true, :by_degree => "phd" }.
+In the last case, it would return: { featured: true, by_degree: 'phd' }.
 
 ## Installation
 
@@ -118,7 +118,7 @@ need to manipulate the given value:
 
 ```ruby
 has_scope :category do |controller, scope, value|
-  value != "all" ? scope.by_category(value) : scope
+  value != 'all' ? scope.by_category(value) : scope
 end
 ```
 
@@ -126,7 +126,7 @@ When used with booleans without `:allow_blank`, it just receives two arguments
 and is just invoked if true is given:
 
 ```ruby
-has_scope :not_voted_by_me, :type => :boolean do |controller, scope|
+has_scope :not_voted_by_me, type: :boolean do |controller, scope|
   scope.not_voted_by(controller.current_user.id)
 end
 ```
