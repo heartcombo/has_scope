@@ -55,7 +55,7 @@ Then for each request:
 ```
 
 You can retrieve all the scopes applied in one action with `current_scopes` method.
-In the last case, it would return: { featured: true, by_degree: 'phd' }.
+In the last case, it would return: `{ featured: true, by_degree: 'phd' }`.
 
 ## Installation
 
@@ -158,6 +158,13 @@ scope :available, ->(*) { where(blocked: false) }
 
 This will allow usual users to get only available items, but admins will
 be able to access blocked items too.
+
+## Check which scopes have been applied
+
+To check which scopes have been applied, you can call `current_scopes` from the controller or view.
+This returns a hash with the scope name as the key and the scope value as the value.
+
+For example, if a boolean `:active` scope has been applied, `current_scopes` will return `{ active: true }`.
 
 ## Bugs and Feedback
 
