@@ -50,7 +50,7 @@ class TreesController < ApplicationController
       false
     end
 
-    if ActionPack::VERSION::MAJOR == 5
+    if ActionPack::VERSION::MAJOR >= 5
       def default_render
         render body: action_name
       end
@@ -334,7 +334,7 @@ class HasScopeTest < ActionController::TestCase
 
   protected
 
-    if ActionPack::VERSION::MAJOR == 5
+    if ActionPack::VERSION::MAJOR >= 5
       # TODO: Remove this when we only support Rails 5.
       def get(action, params = {})
         super action, params: params
