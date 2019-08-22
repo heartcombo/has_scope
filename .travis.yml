@@ -14,6 +14,7 @@ gemfile:
   - gemfiles/rails_5.0.gemfile
   - gemfiles/rails_5.1.gemfile
   - gemfiles/rails_5.2.gemfile
+  - gemfiles/rails_6.0.gemfile
   - gemfiles/rails_head.gemfile
 
 matrix:
@@ -25,9 +26,17 @@ matrix:
     - rvm: 2.1.10
       gemfile: gemfiles/rails_5.2.gemfile
     - rvm: 2.1.10
+      gemfile: gemfiles/rails_6.0.gemfile
+    - rvm: 2.1.10
       gemfile: gemfiles/rails_head.gemfile
     - rvm: 2.2.9
+      gemfile: gemfiles/rails_6.0.gemfile
+    - rvm: 2.2.9
       gemfile: gemfiles/rails_head.gemfile
+    - rvm: 2.3.6
+      gemfile: gemfiles/rails_6.0.gemfile
+    - rvm: 2.4.3
+      gemfile: gemfiles/rails_6.0.gemfile
     - rvm: 2.3.6
       gemfile: gemfiles/rails_head.gemfile
   allow_failures:
