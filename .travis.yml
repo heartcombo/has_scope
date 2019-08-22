@@ -35,9 +35,11 @@ matrix:
       gemfile: gemfiles/rails_head.gemfile
     - rvm: 2.3.6
       gemfile: gemfiles/rails_6.0.gemfile
+    - rvm: 2.3.6
+      gemfile: gemfiles/rails_head.gemfile
     - rvm: 2.4.3
       gemfile: gemfiles/rails_6.0.gemfile
-    - rvm: 2.3.6
+    - rvm: 2.4.3
       gemfile: gemfiles/rails_head.gemfile
   allow_failures:
     - gemfile: gemfiles/rails_head.gemfile
