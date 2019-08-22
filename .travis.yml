@@ -7,6 +7,8 @@ rvm:
   - 2.3.6
   - 2.4.3
   - 2.5.0
+  - 2.6.3
+  - ruby-head
 
 gemfile:
   - gemfiles/rails_4.1.gemfile
@@ -41,8 +43,17 @@ matrix:
       gemfile: gemfiles/rails_6.0.gemfile
     - rvm: 2.4.3
       gemfile: gemfiles/rails_head.gemfile
+    - rvm: 2.6.3
+      gemfile: gemfiles/rails_4.1.gemfile
+    - rvm: 2.6.3
+      gemfile: gemfiles/rails_4.2.gemfile
+    - rvm: 2.6.3
+      gemfile: gemfiles/rails_6.0.gemfile
+    - rvm: 2.6.3
+      gemfile: gemfiles/rails_head.gemfile
   allow_failures:
     - gemfile: gemfiles/rails_head.gemfile
+    - rvm: ruby-head
 
 
 before_install:
