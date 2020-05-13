@@ -1,3 +1,8 @@
+require 'active_support'
+require 'active_support/core_ext/string/strip'
+require 'action_controller'
+require 'action_dispatch/middleware/flash'
+
 module HasScope
   TRUE_VALUES = ["true", true, "1", 1]
 

@@ -7,11 +7,6 @@ require 'mocha/mini_test'
 # Configure Rails
 ENV['RAILS_ENV'] = 'test'
 
-require 'active_support'
-require 'active_support/core_ext/string/strip'
-require 'action_controller'
-require 'action_dispatch/middleware/flash'
-
 $:.unshift File.expand_path('../../lib', __FILE__)
 require 'has_scope'
 
