@@ -55,8 +55,4 @@ matrix:
     - rvm: ruby-head
 
 notifications:
-  email: false
-  slack:
-    on_success: change
-    on_failure: always
-    secure: U/xpgxltcrxFKrV4w0q9PUHu7+WJow8v2hdP2oKYgU4ylfhAbnsmF6rFmzgZPtCt1N1jvO3qydpkSEqh27E4EJ1VDEr76jju3s4292LBBFtneqJx+Lnk4mCHE1NJo1Guyuug8sckP/I/JpDwqgtRgah+vYiley/LMQOVD12xIiQ=
+  email: true
