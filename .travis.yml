@@ -25,9 +25,6 @@ matrix:
       gemfile: gemfiles/rails_5.1.gemfile
     - rvm: 2.7
       gemfile: gemfiles/rails_5.2.gemfile
-  allow_failures:
-    - gemfile: gemfiles/rails_head.gemfile
-    - rvm: ruby-head
 
 notifications:
   email: true
