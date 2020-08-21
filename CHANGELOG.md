@@ -1,5 +1,6 @@
 ## Unreleased
 
+* Add support for Ruby 2.7. (no changes required)
 * Remove support for Rails `4.1` and `4.2` and Ruby `2.1`, `2.2`, and `2.3`.
 
 ## 0.7.2
