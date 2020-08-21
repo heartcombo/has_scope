@@ -17,7 +17,7 @@ require 'has_scope'
 
 HasScope::Routes = ActionDispatch::Routing::RouteSet.new
 HasScope::Routes.draw do
-  get '/:controller(/:action(/:id))'
+  resources :trees, only: %i[index new edit show]
 end
 
 class ApplicationController < ActionController::Base
