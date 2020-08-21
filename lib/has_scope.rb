@@ -2,16 +2,16 @@ module HasScope
   TRUE_VALUES = ["true", true, "1", 1]
 
   ALLOWED_TYPES = {
-    :array   => [[ Array ]],
-    :hash    => [[Hash, ActionController::Parameters]],
-    :boolean => [[ Object ], -> v { TRUE_VALUES.include?(v) }],
-    :default => [[ String, Numeric ]],
+    array:   [[ Array ]],
+    hash:    [[ Hash, ActionController::Parameters ]],
+    boolean: [[ Object ], -> v { TRUE_VALUES.include?(v) }],
+    default: [[ String, Numeric ]],
   }
 
   def self.included(base)
     base.class_eval do
       extend ClassMethods
-      class_attribute :scopes_configuration, :instance_writer => false
+      class_attribute :scopes_configuration, instance_writer: false
       self.scopes_configuration = {}
     end
   end
@@ -57,7 +57,7 @@ module HasScope
     #     value != "all" ? scope.by_category(value) : scope
     #   end
     #
-    #   has_scope :not_voted_by_me, :type => :boolean do |controller, scope|
+    #   has_scope :not_voted_by_me, type: :boolean do |controller, scope|
     #     scope.not_voted_by(controller.current_user.id)
     #   end
     #
@@ -87,7 +87,7 @@ module HasScope
       self.scopes_configuration = scopes_configuration.dup
 
       scopes.each do |scope|
-        scopes_configuration[scope] ||= { :as => scope, :type => :default, :block => block }
+        scopes_configuration[scope] ||= { as: scope, type: :default, block: block }
         scopes_configuration[scope] = self.scopes_configuration[scope].merge(options)
       end
     end
@@ -98,8 +98,8 @@ module HasScope
   # Receives an object where scopes will be applied to.
   #
   #   class GraduationsController < InheritedResources::Base
-  #     has_scope :featured, :type => true, :only => :index
-  #     has_scope :by_degree, :only => :index
+  #     has_scope :featured, type: true, only: :index
+  #     has_scope :by_degree, only: :index
   #
   #     def index
   #       @graduations = apply_scopes(Graduation).all
