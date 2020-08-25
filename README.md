@@ -1,8 +1,8 @@
 ## HasScope
 
 [![Gem Version](https://fury-badge.herokuapp.com/rb/has_scope.svg)](http://badge.fury.io/rb/has_scope)
-[![Build Status](https://api.travis-ci.org/plataformatec/has_scope.svg?branch=master)](http://travis-ci.org/plataformatec/has_scope)
-[![Code Climate](https://codeclimate.com/github/plataformatec/has_scope.svg)](https://codeclimate.com/github/plataformatec/has_scope)
+[![Build Status](https://api.travis-ci.org/heartcombo/has_scope.svg?branch=master)](http://travis-ci.org/heartcombo/has_scope)
+[![Code Climate](https://codeclimate.com/github/heartcombo/has_scope.svg)](https://codeclimate.com/github/heartcombo/has_scope)
 
 Has scope allows you to map incoming controller parameters to named scopes in your resources.
 Imagine the following model called graduations:
@@ -169,7 +169,5 @@ For example, if a boolean `:active` scope has been applied, `current_scopes` wil
 ## Bugs and Feedback
 
 If you discover any bugs or want to drop a line, feel free to create an issue on GitHub.
-
-http://github.com/plataformatec/has_scope/issues
 
 MIT License. Copyright 2009-2019 Plataformatec. http://blog.plataformatec.com.br
