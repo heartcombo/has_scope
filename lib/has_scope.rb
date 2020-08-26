@@ -100,7 +100,7 @@ module HasScope
 
   # Receives an object where scopes will be applied to.
   #
-  #   class GraduationsController < InheritedResources::Base
+  #   class GraduationsController < ApplicationController
   #     has_scope :featured, type: true, only: :index
   #     has_scope :by_degree, only: :index
   #
