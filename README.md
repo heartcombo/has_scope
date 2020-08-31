@@ -98,8 +98,8 @@ HasScope supports several options:
 If `type: :boolean` is set it just calls the named scope, without any arguments, when parameter
 is set to a "true" value. `'true'` and `'1'` are parsed as `true`, everything else as `false`.
 
-When boolean scope is set up with `allow_blank: true`, it will call the scope
-with the value as usual scope.
+When boolean scope is set up with `allow_blank: true`, it will call the scope with the value as
+any usual scope.
 
 ```ruby
 has_scope :visible, type: :boolean
@@ -109,6 +109,11 @@ has_scope :active, type: :boolean, allow_blank: true
 scope :visible, -> { where(visible: true) }
 scope :active, ->(value = true) { where(active: value) }
 ```
+
+_Note_: it is not possible to apply a boolean scope with just the query param being present, e.g.
+`?active`, that's not considered a "true" value (the param value will be `nil`), and thus the
+scope will be called with `false` as argument. In order for the scope to receive a `true` argument
+the param value must be set to one of the "true" values above, e.g. `?active=true` or `?active=1`.
 
 ## Block usage
 
