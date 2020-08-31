@@ -83,6 +83,8 @@ HasScope supports several options:
 
 * `:using` - The subkeys to be used as args when type is a hash.
 
+* `:in` - A shortcut for combining the `:using` option with nested hashes.
+
 * `:if` - Specifies a method, proc or string to call to determine if the scope should apply.
 
 * `:unless` - Specifies a method, proc or string to call to determine if the scope should NOT apply.
@@ -90,8 +92,6 @@ HasScope supports several options:
 * `:default` - Default value for the scope. Whenever supplied the scope is always called.
 
 * `:allow_blank` - Blank values are not sent to scopes by default. Set to true to overwrite.
-
-* `:in` - A shortcut for combining the `:using` option with nested hashes.
 
 ## Boolean usage
 

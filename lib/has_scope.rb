@@ -39,6 +39,8 @@ module HasScope
     # * <tt>:using</tt> - If type is a hash, you can provide :using to convert the hash to
     #                     a named scope call with several arguments.
     #
+    # * <tt>:in</tt> - A shortcut for combining the `:using` option with nested hashes.
+    #
     # * <tt>:if</tt> - Specifies a method, proc or string to call to determine
     #                  if the scope should apply
     #
