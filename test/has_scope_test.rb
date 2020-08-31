@@ -327,7 +327,7 @@ class HasScopeTest < ActionController::TestCase
 
   protected
 
-    def mock_tree(stubs={})
+    def mock_tree(stubs = {})
       @mock_tree ||= mock(stubs)
     end
 

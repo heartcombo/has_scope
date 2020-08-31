@@ -109,7 +109,7 @@ module HasScope
   #     end
   #   end
   #
-  def apply_scopes(target, hash=params)
+  def apply_scopes(target, hash = params)
     scopes_configuration.each do |scope, options|
       next unless apply_scope_to_action?(options)
       key = options[:as]
