@@ -125,7 +125,7 @@ module HasScope
         end
       end
 
-      value = parse_value(options[:type], key, value)
+      value = parse_value(options[:type], value)
       value = normalize_blanks(value)
 
       if call_scope && (value.present? || options[:allow_blank])
@@ -138,7 +138,7 @@ module HasScope
   end
 
   # Set the real value for the current scope if type check.
-  def parse_value(type, key, value) #:nodoc:
+  def parse_value(type, value) #:nodoc:
     klasses, parser = ALLOWED_TYPES[type]
     if klasses.any? { |klass| value.is_a?(klass) }
       parser ? parser.call(value) : value
