@@ -17,6 +17,7 @@ class TreesController < ApplicationController
   has_scope :categories, type: :array
   has_scope :title, in: :q
   has_scope :content, in: :q
+  has_scope :never_called, in: :q
   has_scope :conifer, type: :boolean, allow_blank: true
 
   has_scope :only_short, type: :boolean do |controller, scope|
@@ -372,6 +373,7 @@ class HasScopeTest < ActionController::TestCase
     hash = { 'title' => 'the-title', 'content' => 'the-content' }
     Tree.expects(:title).with('the-title').returns(Tree)
     Tree.expects(:content).with('the-content').returns(Tree)
+    Tree.expects(:never_called).never
     Tree.expects(:all).returns([mock_tree])
 
     get :index, params: { q: hash }
