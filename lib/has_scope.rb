@@ -74,6 +74,10 @@ module HasScope
       if options.key?(:in)
         options[:as] = options[:in]
         options[:using] = scopes
+
+        if options.key?(:default) && !options[:default].is_a?(Hash)
+          options[:default] = scopes.each_with_object({}) { |scope, hash| hash[scope] = options[:default] }
+        end
       end
 
       if options.key?(:using)
