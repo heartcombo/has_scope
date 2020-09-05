@@ -16,8 +16,8 @@ class TreesController < ApplicationController
   has_scope :paginate_blank, type: :hash, allow_blank: true
   has_scope :paginate_default, type: :hash, default: { page: 1, per_page: 10 }, only: :edit
   has_scope :args_paginate, type: :hash, using: [:page, :per_page]
-  has_scope :args_paginate_blank, type: :hash, using: [:page, :per_page], allow_blank: true
-  has_scope :args_paginate_default, type: :hash, using: [:page, :per_page], default: { page: 1, per_page: 10 }, only: :edit
+  has_scope :args_paginate_blank, using: [:page, :per_page], allow_blank: true
+  has_scope :args_paginate_default, using: [:page, :per_page], default: { page: 1, per_page: 10 }, only: :edit
   has_scope :categories, type: :array
   has_scope :title, in: :q
   has_scope :content, in: :q
