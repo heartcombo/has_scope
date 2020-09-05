@@ -13,11 +13,14 @@ class TreesController < ApplicationController
   has_scope :planted_after, type: :date
   has_scope :calculate_height, default: proc {|c| c.session[:height] || 20 }, only: :new
   has_scope :paginate, type: :hash
+  has_scope :paginate_blank, type: :hash, allow_blank: true
   has_scope :args_paginate, type: :hash, using: [:page, :per_page]
+  has_scope :args_paginate_blank, type: :hash, using: [:page, :per_page], allow_blank: true
   has_scope :categories, type: :array
   has_scope :title, in: :q
   has_scope :content, in: :q
-  has_scope :never_called, in: :q
+  has_scope :metadata, in: :q
+  has_scope :metadata_blank, in: :q, allow_blank: true
   has_scope :conifer, type: :boolean, allow_blank: true
 
   has_scope :only_short, type: :boolean do |controller, scope|
@@ -234,8 +237,30 @@ class HasScopeTest < ActionController::TestCase
     assert_equal({ }, current_scopes)
   end
 
+  def test_hash_with_blank_values_and_allow_blank_is_called
+    hash = { "page" => "", "per_page" => "" }
+    Tree.expects(:paginate_blank).with({}).returns(Tree)
+    Tree.expects(:all).returns([mock_tree])
+
+    get :index, params: { paginate_blank: hash }
+
+    assert_equal([mock_tree], assigns(:@trees))
+    assert_equal({ paginate_blank: {} }, current_scopes)
+  end
+
+  def test_hash_with_using_and_blank_values_and_allow_blank_is_called
+    hash = { "page" => "", "per_page" => "" }
+    Tree.expects(:args_paginate_blank).with(nil, nil).returns(Tree)
+    Tree.expects(:all).returns([mock_tree])
+
+    get :index, params: { args_paginate_blank: hash }
+
+    assert_equal([mock_tree], assigns(:@trees))
+    assert_equal({ args_paginate_blank: {} }, current_scopes)
+  end
+
   def test_nested_hash_with_blank_values_is_ignored
-    hash = { "parent" => { "children" => ""} }
+    hash = { "parent" => { "children" => "" } }
     Tree.expects(:paginate).never
     Tree.expects(:all).returns([mock_tree])
 
@@ -373,7 +398,8 @@ class HasScopeTest < ActionController::TestCase
     hash = { 'title' => 'the-title', 'content' => 'the-content' }
     Tree.expects(:title).with('the-title').returns(Tree)
     Tree.expects(:content).with('the-content').returns(Tree)
-    Tree.expects(:never_called).never
+    Tree.expects(:metadata).never
+    Tree.expects(:metadata_blank).with(nil).returns(Tree)
     Tree.expects(:all).returns([mock_tree])
 
     get :index, params: { q: hash }
