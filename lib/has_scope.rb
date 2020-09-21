@@ -190,6 +190,11 @@ module HasScope
   def applicable?(string_proc_or_symbol, expected) #:nodoc:
     case string_proc_or_symbol
     when String
+      ActiveSupport::Deprecation.warn <<-DEPRECATION.squish
+        [HasScope] Passing a string to determine if the scope should be applied
+        is deprecated and it will be removed in a future version of HasScope.
+      DEPRECATION
+
       eval(string_proc_or_symbol) == expected
     when Proc
       string_proc_or_symbol.call(self) == expected
