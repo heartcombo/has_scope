@@ -1,7 +1,6 @@
 ## HasScope
 
 [![Gem Version](https://fury-badge.herokuapp.com/rb/has_scope.svg)](http://badge.fury.io/rb/has_scope)
-[![Build Status](https://api.travis-ci.org/heartcombo/has_scope.svg?branch=master)](http://travis-ci.org/heartcombo/has_scope)
 [![Code Climate](https://codeclimate.com/github/heartcombo/has_scope.svg)](https://codeclimate.com/github/heartcombo/has_scope)
 
 Has scope allows you to map incoming controller parameters to named scopes in your resources.
@@ -85,9 +84,9 @@ HasScope supports several options:
 
 * `:in` - A shortcut for combining the `:using` option with nested hashes.
 
-* `:if` - Specifies a method, proc or string to call to determine if the scope should apply.
+* `:if` - Specifies a method or proc to call to determine if the scope should apply. Passing a string is deprecated and it will be removed in a future version.
 
-* `:unless` - Specifies a method, proc or string to call to determine if the scope should NOT apply.
+* `:unless` - Specifies a method or proc to call to determine if the scope should NOT apply. Passing a string is deprecated and it will be removed in a future version.
 
 * `:default` - Default value for the scope. Whenever supplied the scope is always called.
 
@@ -170,6 +169,13 @@ To check which scopes have been applied, you can call `current_scopes` from the 
 This returns a hash with the scope name as the key and the scope value as the value.
 
 For example, if a boolean `:active` scope has been applied, `current_scopes` will return `{ active: true }`.
+
+## Supported Ruby / Rails versions
+
+We intend to maintain support for all Ruby / Rails versions that haven't reached end-of-life.
+
+For more information about specific versions please check [Ruby](https://www.ruby-lang.org/en/downloads/branches/)
+and [Rails](https://guides.rubyonrails.org/maintenance_policy.html) maintenance policies, and our test matrix.
 
 ## Bugs and Feedback
 

@@ -11,7 +11,7 @@ class TreesController < ApplicationController
   has_scope :root_type, as: :root, allow_blank: true
   has_scope :planted_before, default: proc { Date.today }
   has_scope :planted_after, type: :date
-  has_scope :calculate_height, default: proc {|c| c.session[:height] || 20 }, only: :new
+  has_scope :calculate_height, default: proc { |c| c.session[:height] || 20 }, only: :new
   has_scope :paginate, type: :hash
   has_scope :paginate_blank, type: :hash, allow_blank: true
   has_scope :paginate_default, type: :hash, default: { page: 1, per_page: 10 }, only: :edit
@@ -25,6 +25,8 @@ class TreesController < ApplicationController
   has_scope :metadata_blank, in: :q, allow_blank: true
   has_scope :metadata_default, in: :q, default: "default", only: :edit
   has_scope :conifer, type: :boolean, allow_blank: true
+  has_scope :eval_plant, if: "params[:eval_plant].present?", unless: "params[:skip_eval_plant].present?"
+  has_scope :proc_plant, if: -> c { c.params[:proc_plant].present? }, unless: -> c { c.params[:skip_proc_plant].present? }
 
   has_scope :only_short, type: :boolean do |controller, scope|
     scope.only_really_short!(controller.object_id)
@@ -49,6 +51,16 @@ class TreesController < ApplicationController
   alias :edit :show
 
   protected
+    # Silence deprecations in the test suite, except for the actual deprecated String if/unless options.
+    # TODO: remove with the deprecation.
+    def apply_scopes(*)
+      if params[:eval_plant]
+        super
+      else
+        ActiveSupport::Deprecation.silence { super }
+      end
+    end
+
     def restrict_to_only_tall_trees?
       true
     end
@@ -154,6 +166,28 @@ class HasScopeTest < ActionController::TestCase
 
     assert_equal([mock_tree], assigns(:@trees))
     assert_equal({ }, current_scopes)
+  end
+
+  def test_scope_with_eval_string_if_and_unless_options_is_deprecated
+    Tree.expects(:eval_plant).with('value').returns(Tree)
+    Tree.expects(:all).returns([mock_tree])
+
+    assert_deprecated(/Passing a string to determine if the scope should be applied is deprecated/) do
+      get :index, params: { eval_plant: 'value', skip_eval_plant: nil }
+    end
+
+    assert_equal([mock_tree], assigns(:@trees))
+    assert_equal({ eval_plant: 'value' }, current_scopes)
+  end
+
+  def test_scope_with_proc_if_and_unless_options
+    Tree.expects(:proc_plant).with('value').returns(Tree)
+    Tree.expects(:all).returns([mock_tree])
+
+    get :index, params: { proc_plant: 'value', skip_proc_plant: nil }
+
+    assert_equal([mock_tree], assigns(:@trees))
+    assert_equal({ proc_plant: 'value' }, current_scopes)
   end
 
   def test_scope_is_called_except_on_index
