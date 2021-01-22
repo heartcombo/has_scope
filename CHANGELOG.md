@@ -4,6 +4,7 @@
 * Require `active_support` and `action_controller` explicitly to prevent possible `uninitialized constant` errors.
 * Add support for Ruby 2.7. (no changes required)
 * Remove support for Rails `4.1` and `4.2` and Ruby `2.1`, `2.2`, and `2.3`.
+* Move CI to GitHub Actions.
 
 ## 0.7.2
 
