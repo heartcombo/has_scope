@@ -2,7 +2,7 @@
 
 * Deprecate passing a String to `if` and `unless` options, in order to stop using `eval` in code.
 * Require `active_support` and `action_controller` explicitly to prevent possible `uninitialized constant` errors.
-* Add support for Ruby 2.7, drop support for Ruby < 2.4.
+* Add support for Ruby 2.7 and 3.0, drop support for Ruby < 2.4.
 * Add support for Rails 6.1, drop support for Rails < 5.
 * Move CI to GitHub Actions.
 
