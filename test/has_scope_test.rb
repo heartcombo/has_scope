@@ -161,6 +161,15 @@ class HasScopeTest < ActionController::TestCase
     assert_equal({ eval_plant: 'value' }, current_scopes)
   end
 
+  def test_deprecated_scope_with_eval_string_if_and_unless_options
+    Tree.expects(:eval_plant).with('value').returns(Tree)
+    Tree.expects(:all).returns([mock_tree])
+
+    assert_deprecated(/Passing a string to determine if the scope should be applied is deprecated/) do
+      get :index, params: { eval_plant: 'value', skip_eval_plant: nil }
+    end
+  end
+
   def test_scope_with_proc_if_and_unless_options
     Tree.expects(:proc_plant).with('value').returns(Tree)
     Tree.expects(:all).returns([mock_tree])

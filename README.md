@@ -85,9 +85,9 @@ HasScope supports several options:
 
 * `:in` - A shortcut for combining the `:using` option with nested hashes.
 
-* `:if` - Specifies a method, proc or string to call to determine if the scope should apply.
+* `:if` - Specifies a method or proc to call to determine if the scope should apply. Passing a string is deprecated and it will be removed in a future version.
 
-* `:unless` - Specifies a method, proc or string to call to determine if the scope should NOT apply.
+* `:unless` - Specifies a method or proc to call to determine if the scope should NOT apply. Passing a string is deprecated and it will be removed in a future version.
 
 * `:default` - Default value for the scope. Whenever supplied the scope is always called.
 
