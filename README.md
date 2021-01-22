@@ -170,6 +170,13 @@ This returns a hash with the scope name as the key and the scope value as the va
 
 For example, if a boolean `:active` scope has been applied, `current_scopes` will return `{ active: true }`.
 
+## Supported Ruby / Rails versions
+
+We intend to maintain support for all Ruby / Rails versions that haven't reached end-of-life.
+
+For more information about specific versions please check [Ruby](https://www.ruby-lang.org/en/downloads/branches/)
+and [Rails](https://guides.rubyonrails.org/maintenance_policy.html) maintenance policies, and our test matrix.
+
 ## Bugs and Feedback
 
 If you discover any bugs or want to drop a line, feel free to create an issue on GitHub.
