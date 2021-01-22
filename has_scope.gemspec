@@ -22,10 +22,10 @@ Gem::Specification.new do |s|
     'README.md'
   ]
 
-  s.required_ruby_version = '>= 2.4.0'
+  s.required_ruby_version = '>= 2.5.0'
 
-  s.add_runtime_dependency 'actionpack', '>= 5.0'
-  s.add_runtime_dependency 'activesupport', '>= 5.0'
+  s.add_runtime_dependency 'actionpack', '>= 5.2'
+  s.add_runtime_dependency 'activesupport', '>= 5.2'
 
   s.add_development_dependency 'rake'
   s.add_development_dependency 'mocha', '~> 1.0.0'
