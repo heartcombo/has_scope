@@ -44,6 +44,16 @@ class TreesController < ApplicationController
   alias :edit :show
 
   protected
+    # Silence deprecations in the test suite, except for the actual deprecated String if/unless options.
+    # TODO: remove with the deprecation.
+    def apply_scopes(*)
+      if params[:eval_plant]
+        super
+      else
+        ActiveSupport::Deprecation.silence { super }
+      end
+    end
+
     def restrict_to_only_tall_trees?
       true
     end
