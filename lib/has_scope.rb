@@ -74,6 +74,10 @@ module HasScope
       if options.key?(:in)
         options[:as] = options[:in]
         options[:using] = scopes
+
+        if options.key?(:default) && !options[:default].is_a?(Hash)
+          options[:default] = scopes.each_with_object({}) { |scope, hash| hash[scope] = options[:default] }
+        end
       end
 
       if options.key?(:using)
@@ -128,9 +132,17 @@ module HasScope
       value = parse_value(options[:type], value)
       value = normalize_blanks(value)
 
-      if call_scope && (value.present? || options[:allow_blank])
+      if value && options.key?(:using)
+        scope_value = value.values_at(*options[:using])
+        call_scope &&= scope_value.all?(&:present?) || options[:allow_blank]
+      else
+        scope_value = value
+        call_scope &&= value.present? || options[:allow_blank]
+      end
+
+      if call_scope
         current_scopes[key] = value
-        target = call_scope_by_type(options[:type], scope, target, value, options)
+        target = call_scope_by_type(options[:type], scope, target, scope_value, options)
       end
     end
 
@@ -165,8 +177,7 @@ module HasScope
 
     if type == :boolean && !options[:allow_blank]
       block ? block.call(self, target) : target.send(scope)
-    elsif value && options.key?(:using)
-      value = value.values_at(*options[:using])
+    elsif options.key?(:using)
       block ? block.call(self, target, value) : target.send(scope, *value)
     else
       block ? block.call(self, target, value) : target.send(scope, value)

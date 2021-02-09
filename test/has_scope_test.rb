@@ -13,10 +13,17 @@ class TreesController < ApplicationController
   has_scope :planted_after, type: :date
   has_scope :calculate_height, default: proc { |c| c.session[:height] || 20 }, only: :new
   has_scope :paginate, type: :hash
+  has_scope :paginate_blank, type: :hash, allow_blank: true
+  has_scope :paginate_default, type: :hash, default: { page: 1, per_page: 10 }, only: :edit
   has_scope :args_paginate, type: :hash, using: [:page, :per_page]
+  has_scope :args_paginate_blank, using: [:page, :per_page], allow_blank: true
+  has_scope :args_paginate_default, using: [:page, :per_page], default: { page: 1, per_page: 10 }, only: :edit
   has_scope :categories, type: :array
   has_scope :title, in: :q
   has_scope :content, in: :q
+  has_scope :metadata, in: :q
+  has_scope :metadata_blank, in: :q, allow_blank: true
+  has_scope :metadata_default, in: :q, default: "default", only: :edit
   has_scope :conifer, type: :boolean, allow_blank: true
   has_scope :eval_plant, if: "params[:eval_plant].present?", unless: "params[:skip_eval_plant].present?"
   has_scope :proc_plant, if: -> c { c.params[:proc_plant].present? }, unless: -> c { c.params[:skip_proc_plant].present? }
@@ -267,8 +274,30 @@ class HasScopeTest < ActionController::TestCase
     assert_equal({ }, current_scopes)
   end
 
+  def test_hash_with_blank_values_and_allow_blank_is_called
+    hash = { "page" => "", "per_page" => "" }
+    Tree.expects(:paginate_blank).with({}).returns(Tree)
+    Tree.expects(:all).returns([mock_tree])
+
+    get :index, params: { paginate_blank: hash }
+
+    assert_equal([mock_tree], assigns(:@trees))
+    assert_equal({ paginate_blank: {} }, current_scopes)
+  end
+
+  def test_hash_with_using_and_blank_values_and_allow_blank_is_called
+    hash = { "page" => "", "per_page" => "" }
+    Tree.expects(:args_paginate_blank).with(nil, nil).returns(Tree)
+    Tree.expects(:all).returns([mock_tree])
+
+    get :index, params: { args_paginate_blank: hash }
+
+    assert_equal([mock_tree], assigns(:@trees))
+    assert_equal({ args_paginate_blank: {} }, current_scopes)
+  end
+
   def test_nested_hash_with_blank_values_is_ignored
-    hash = { "parent" => { "children" => ""} }
+    hash = { "parent" => { "children" => "" } }
     Tree.expects(:paginate).never
     Tree.expects(:all).returns([mock_tree])
 
@@ -321,22 +350,45 @@ class HasScopeTest < ActionController::TestCase
 
   def test_scope_is_called_with_default_value
     Tree.expects(:shadown_range).with(10).returns(Tree).in_sequence
+    Tree.expects(:paginate_default).with('page' => 1, 'per_page' => 10).returns(Tree).in_sequence
+    Tree.expects(:args_paginate_default).with(1, 10).returns(Tree).in_sequence
+    Tree.expects(:metadata_default).with('default').returns(Tree).in_sequence
     Tree.expects(:find).with('42').returns(mock_tree).in_sequence
 
     get :edit, params: { id: '42' }
 
     assert_equal(mock_tree, assigns(:@tree))
-    assert_equal({ shadown_range: 10 }, current_scopes)
+    assert_equal({
+      shadown_range: 10,
+      paginate_default: { 'page' => 1, 'per_page' => 10 },
+      args_paginate_default: { 'page' => 1, 'per_page' => 10 },
+      q: { 'metadata_default' => 'default' }
+    }, current_scopes)
   end
 
   def test_default_scope_value_can_be_overwritten
     Tree.expects(:shadown_range).with('20').returns(Tree).in_sequence
+    Tree.expects(:paginate_default).with('page' => '2', 'per_page' => '20').returns(Tree).in_sequence
+    Tree.expects(:args_paginate_default).with('3', '15').returns(Tree).in_sequence
+    Tree.expects(:metadata_blank).with(nil).returns(Tree).in_sequence
+    Tree.expects(:metadata_default).with('other').returns(Tree).in_sequence
     Tree.expects(:find).with('42').returns(mock_tree).in_sequence
 
-    get :edit, params: { id: '42', shadown_range: '20' }
+    get :edit, params: {
+      id: '42',
+      shadown_range: '20',
+      paginate_default: { page: 2, per_page: 20 },
+      args_paginate_default: { page: 3, per_page: 15},
+      q: { metadata_default: 'other' }
+    }
 
     assert_equal(mock_tree, assigns(:@tree))
-    assert_equal({ shadown_range: '20' }, current_scopes)
+    assert_equal({
+      shadown_range: '20',
+      paginate_default: { 'page' => '2', 'per_page' => '20' },
+      args_paginate_default: { 'page' => '3', 'per_page' => '15' },
+      q: { 'metadata_default' => 'other' }
+    }, current_scopes)
   end
 
   def test_scope_with_different_key
@@ -406,6 +458,8 @@ class HasScopeTest < ActionController::TestCase
     hash = { 'title' => 'the-title', 'content' => 'the-content' }
     Tree.expects(:title).with('the-title').returns(Tree)
     Tree.expects(:content).with('the-content').returns(Tree)
+    Tree.expects(:metadata).never
+    Tree.expects(:metadata_blank).with(nil).returns(Tree)
     Tree.expects(:all).returns([mock_tree])
 
     get :index, params: { q: hash }
