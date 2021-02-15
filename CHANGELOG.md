@@ -1,4 +1,4 @@
-## Unreleased
+## 0.8.0
 
 * Fix usage of `:in` when defined with a `:default` option that is not a hash, to apply the default when param is not given.
 * Fix usage of `:in` incorrectly calling scopes when receiving a blank param value without `allow_blank` set.
