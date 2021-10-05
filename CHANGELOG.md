@@ -1,3 +1,7 @@
+## Unreleased
+
+* Add support for Rails 7.0 alpha 2 (no changes required)
+
 ## 0.8.0
 
 * Fix usage of `:in` when defined with a `:default` option that is not a hash, to apply the default when param is not given.
