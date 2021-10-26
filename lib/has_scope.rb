@@ -34,12 +34,14 @@ module HasScope
     # * <tt>:except</tt> - In which actions the scope is not applied. By default is :none.
     #
     # * <tt>:as</tt> - The key in the params hash expected to find the scope.
-    #                  Defaults to the scope name.
+    #                  Defaults to the scope name. Provide an array to accept nested parameters.
     #
     # * <tt>:using</tt> - If type is a hash, you can provide :using to convert the hash to
     #                     a named scope call with several arguments.
     #
-    # * <tt>:in</tt> - A shortcut for combining the `:using` option with nested hashes.
+    # * <tt>:in</tt> - A shortcut for combining the `:using` option with nested hashes. Looks for a query parameter
+    #                  matching the scope name in the provided values. Provide an array for more
+    #                  than one level of nested hashes.
     #
     # * <tt>:if</tt> - Specifies a method, proc or string to call to determine
     #                  if the scope should apply
@@ -72,8 +74,8 @@ module HasScope
       options.assert_valid_keys(:type, :only, :except, :if, :unless, :default, :as, :using, :allow_blank, :in)
 
       if options.key?(:in)
+        options[:using] = options[:as] || scopes
         options[:as] = options[:in]
-        options[:using] = scopes
 
         if options.key?(:default) && !options[:default].is_a?(Hash)
           options[:default] = scopes.each_with_object({}) { |scope, hash| hash[scope] = options[:default] }
@@ -96,7 +98,9 @@ module HasScope
       self.scopes_configuration = scopes_configuration.dup
 
       scopes.each do |scope|
-        scopes_configuration[scope] ||= { as: scope, type: :default, block: block }
+        scopes_configuration[scope] ||= {
+          as: Array(options.delete(:as).presence || scope), type: :default, block: block
+        }
         scopes_configuration[scope] = self.scopes_configuration[scope].merge(options)
       end
     end
@@ -118,31 +122,37 @@ module HasScope
   def apply_scopes(target, hash = params)
     scopes_configuration.each do |scope, options|
       next unless apply_scope_to_action?(options)
-      key = options[:as]
+      *parent_keys, key = options[:as]
 
-      if hash.key?(key)
-        value, call_scope = hash[key], true
+      if parent_keys.empty? && hash.key?(key)
+        value = hash[key]
+      elsif options.key?(:using) &&
+            ALLOWED_TYPES[:hash].first.any? { |klass| hash.dig(*parent_keys, key).is_a?(klass) }
+        value = hash.dig(*parent_keys)[key]
+      elsif (parent_keys.present? ? hash.dig(*parent_keys) : hash)&.key?(key)
+        value = (parent_keys.present? ? hash.dig(*parent_keys) : hash)[key]
       elsif options.key?(:default)
-        value, call_scope = options[:default], true
+        value = options[:default]
         if value.is_a?(Proc)
           value = value.arity == 0 ? value.call : value.call(self)
         end
+      else
+        next
       end
 
       value = parse_value(options[:type], value)
       value = normalize_blanks(value)
 
       if value && options.key?(:using)
+        value = value.slice(*options[:using])
         scope_value = value.values_at(*options[:using])
-        call_scope &&= scope_value.all?(&:present?) || options[:allow_blank]
-      else
-        scope_value = value
-        call_scope &&= value.present? || options[:allow_blank]
-      end
-
-      if call_scope
-        current_scopes[key] = value
-        target = call_scope_by_type(options[:type], scope, target, scope_value, options)
+        if scope_value.all?(&:present?) || options[:allow_blank]
+          (current_scopes(parent_keys)[key] ||= {}).merge!(value)
+          target = call_scope_by_type(options[:type], scope, target, scope_value, options)
+        end
+      elsif value.present? || options[:allow_blank]
+        current_scopes(parent_keys)[key] = value
+        target = call_scope_by_type(options[:type], scope, target, value, options)
       end
     end
 
@@ -217,8 +227,14 @@ module HasScope
   end
 
   # Returns the scopes used in this action.
-  def current_scopes
+  def current_scopes(keys = [])
     @current_scopes ||= {}
+    cs = @current_scopes
+    keys.each do |k|
+      cs[k] ||= {}
+      cs = cs[k]
+    end
+    cs
   end
 end
 

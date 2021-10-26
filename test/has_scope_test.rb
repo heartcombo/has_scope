@@ -17,13 +17,20 @@ class TreesController < ApplicationController
   has_scope :paginate_default, type: :hash, default: { page: 1, per_page: 10 }, only: :edit
   has_scope :args_paginate, type: :hash, using: [:page, :per_page]
   has_scope :args_paginate_blank, using: [:page, :per_page], allow_blank: true
+  has_scope :nested_args_paginate, as: [:args, :paginate], using: [:page, :per_page]
   has_scope :args_paginate_default, using: [:page, :per_page], default: { page: 1, per_page: 10 }, only: :edit
   has_scope :categories, type: :array
   has_scope :title, in: :q
   has_scope :content, in: :q
   has_scope :metadata, in: :q
+  has_scope :user_agent, in: [:q, :headers, :client]
   has_scope :metadata_blank, in: :q, allow_blank: true
   has_scope :metadata_default, in: :q, default: "default", only: :edit
+  has_scope :args_time, in: [:log, :time], as: [:before, :after]
+  has_scope :ip_address, as: [:log, :client, :ip]
+  has_scope :log_level, as: [:log, :level]
+  has_scope :debug_mode, as: [:log, :debug, :mode], type: :boolean, default: false
+  has_scope :largest_size, as: [:sizes, 2, :name]
   has_scope :conifer, type: :boolean, allow_blank: true
   has_scope :eval_plant, if: "params[:eval_plant].present?", unless: "params[:skip_eval_plant].present?"
   has_scope :proc_plant, if: -> c { c.params[:proc_plant].present? }, unless: -> c { c.params[:skip_proc_plant].present? }
@@ -454,8 +461,109 @@ class HasScopeTest < ActionController::TestCase
     assert_equal({ by_category: 'for' }, current_scopes)
   end
 
-  def test_scope_with_nested_hash_and_in_option
-    hash = { 'title' => 'the-title', 'content' => 'the-content' }
+  def test_scope_with_nested_array
+    Tree.expects(:largest_size).with('L').returns(Tree)
+    Tree.expects(:all).returns([mock_tree])
+
+    get :index, params: { 'sizes' => [{'name' => 'S'}, {'name' => 'M'}, {'name' => 'L'}] }
+
+    assert_equal([mock_tree], assigns(:@trees))
+    assert_equal({ :sizes => { 2 => {:name => 'L'} } }, current_scopes)
+  end
+
+  def test_nested_with_in_option
+    hash = { 'title' => 'the-title', 'content' => 'the-content', :headers => { :client => { 'user_agent' => 'the-user-agent'} } }
+    Tree.expects(:user_agent).with('the-user-agent').returns(Tree)
+    Tree.expects(:title).with('the-title').returns(Tree)
+    Tree.expects(:content).with('the-content').returns(Tree)
+    Tree.expects(:metadata).never
+    Tree.expects(:metadata_blank).with(nil).returns(Tree)
+    Tree.expects(:all).returns([mock_tree])
+
+    get :index, params: { q: hash }
+
+    assert_equal([mock_tree], assigns(:@trees))
+    assert_equal({ q: hash }, current_scopes)
+  end
+
+  def test_nested_with_as_option
+    Tree.expects(:ip_address).with('127.0.0.1').returns(Tree)
+    Tree.expects(:log_level).never
+    Tree.expects(:all).returns([mock_tree])
+
+    get :index, params: { 'log' => { 'client' => { 'ip' => '127.0.0.1', 'unused' => 'jibberish' } } }
+
+    assert_equal([mock_tree], assigns(:@trees))
+    assert_equal({ :log => { :client => { :ip => '127.0.0.1' } } }, current_scopes)
+  end
+
+  def test_nested_as_with_using_option
+    Tree.expects(:nested_args_paginate).with("1", "10").returns(Tree)
+    Tree.expects(:all).returns([mock_tree])
+
+    get :index, params: {"args": {"paginate": { "page" => "1", "per_page" => "10" } }}
+
+    assert_equal([mock_tree], assigns(:@trees))
+    assert_equal( {"args": {"paginate": { "page" => "1", "per_page" => "10" } }}, current_scopes)
+  end
+
+  def test_nested_with_using_option
+    Tree.expects(:args_time).with('10am', '9am').returns(Tree)
+    Tree.expects(:all).returns([mock_tree])
+
+    get :index, params: { 'log' => { 'time' => { 'before' => '10am', 'after' => '9am' } } }
+
+    assert_equal([mock_tree], assigns(:@trees))
+    assert_equal({ :log => { :time => { 'before' => '10am', 'after' => '9am' } } }, current_scopes)
+  end
+
+  def test_nested_with_as_option_different_nested_levels
+    hash = { :log => { :client => { :ip => '127.0.0.1' }, :level => 'info' } }
+    Tree.expects(:ip_address).with('127.0.0.1').returns(Tree)
+    Tree.expects(:log_level).with('info').returns(Tree)
+    Tree.expects(:all).returns([mock_tree])
+
+    get :index, params: hash
+
+    assert_equal([mock_tree], assigns(:@trees))
+    assert_equal(hash, current_scopes)
+  end
+
+  def test_nested_with_as_option_different_nested_levels
+    hash = { :log => { :client => { :ip => '127.0.0.1' }, :level => 'info' } }
+    Tree.expects(:ip_address).with('127.0.0.1').returns(Tree)
+    Tree.expects(:log_level).with('info').returns(Tree)
+    Tree.expects(:all).returns([mock_tree])
+
+    get :index, params: hash
+
+    assert_equal([mock_tree], assigns(:@trees))
+    assert_equal(hash, current_scopes)
+  end
+
+  def test_nested_with_boolean_type
+    Tree.expects(:debug_mode).with().returns(Tree)
+    Tree.expects(:all).returns([mock_tree])
+
+    get :index, params: { :log => { :debug => { :mode => 'true' } } }
+
+    assert_equal([mock_tree], assigns(:@trees))
+    assert_equal({ :log => { :debug => { :mode => true } } }, current_scopes)
+  end
+
+  def test_nested_with_boolean_type_default
+    Tree.expects(:debug_mode).never
+    Tree.expects(:all).returns([mock_tree])
+
+    get :index, params: { :log => { :debug => { :unused => 'unused' } } }
+
+    assert_equal([mock_tree], assigns(:@trees))
+    assert_equal({ }, current_scopes)
+  end
+
+  def test_nested_with_using_option_array
+    hash = { 'title' => 'the-title', 'content' => 'the-content', :headers => { :client => { 'user_agent' => 'the-user-agent'} } }
+    Tree.expects(:user_agent).with('the-user-agent').returns(Tree)
     Tree.expects(:title).with('the-title').returns(Tree)
     Tree.expects(:content).with('the-content').returns(Tree)
     Tree.expects(:metadata).never
