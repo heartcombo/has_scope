@@ -11,6 +11,7 @@ class Graduation < ActiveRecord::Base
   scope :featured, -> { where(featured: true) }
   scope :by_degree, -> degree { where(degree: degree) }
   scope :by_period, -> started_at, ended_at { where("started_at = ? AND ended_at = ?", started_at, ended_at) }
+  scope :by_department, -> department { where(department: department) }
 end
 ```
 
@@ -20,6 +21,8 @@ You can use those named scopes as filters by declaring them on your controller:
 class GraduationsController < ApplicationController
   has_scope :featured, type: :boolean
   has_scope :by_degree
+  has_scope :by_period, using: %i[started_at ended_at], type: :hash
+  has_scope :by_department, as: [:degree_info, :department]
 end
 ```
 
@@ -30,6 +33,7 @@ class GraduationsController < ApplicationController
   has_scope :featured, type: :boolean
   has_scope :by_degree
   has_scope :by_period, using: %i[started_at ended_at], type: :hash
+  has_scope :by_department, as: [:degree_info, :department]
 
   def index
     @graduations = apply_scopes(Graduation).all
@@ -51,6 +55,9 @@ Then for each request:
 
 /graduations?featured=true&by_degree=phd
 #=> brings featured graduations with phd degree
+
+/graduations?featured=true&degree_info[department]=biology
+#=> brings featured graduations in biology department
 ```
 
 You can retrieve all the scopes applied in one action with `current_scopes` method.
@@ -78,11 +85,11 @@ HasScope supports several options:
 
 * `:except` - In which actions the scope is not applied.
 
-* `:as` - The key in the params hash expected to find the scope. Defaults to the scope name.
+* `:as` - The key in the params hash expected to find the scope. Defaults to the scope name. Provide an array to accept nested parameters. If you also provide `:in`, this acts more like `:using` than its own nested array.
 
 * `:using` - The subkeys to be used as args when type is a hash.
 
-* `:in` - A shortcut for combining the `:using` option with nested hashes.
+* `:in` - A shortcut for combining the `:using` option with nested hashes. Looks for a query parameter matching the scope name in the provided values. Provide an array for more than one level of nested hashes.
 
 * `:if` - Specifies a method or proc to call to determine if the scope should apply. Passing a string is deprecated and it will be removed in a future version.
 
@@ -133,6 +140,49 @@ and is just invoked if true is given:
 has_scope :not_voted_by_me, type: :boolean do |controller, scope|
   scope.not_voted_by(controller.current_user.id)
 end
+```
+
+## Nested query parameters
+Use `:in` and `:as` with array arguments to specify nested hashes and arrays in query parameters.
+
+```ruby
+class Graduation < ActiveRecord::Base
+  scope :president, -> president { where(college: { president: president }) }
+  scope :args_gpa, -> gte, lte { where("gpa > ? AND gpa < ?", gte, lte) }
+  scope :number_failed_classes, -> n { where(number_failed_classes: n) }
+  scope :recipient_first_name, -> first_name { where(recipient: { first_name: first_name}) }
+end
+```
+
+Your controller can look for nested query parameters that use these scopes.
+```ruby
+class GraduationsController < ApplicationController
+
+  # e.g. find graduations where the college president was 'Tsai'
+  # /graduations?degree_info[college][president]=Tsai
+  has_scope :president, in: [:degree_info, :college]
+  
+  # e.g. find graduations where the student's GPA was between 2.5 and 3.5
+  # /graduations?transcript[gpa][gte]=2.5&transcript[gpa][lte]=3.5
+  has_scope :args_gpa, in: [:transcript, :gpa], as: [:gte, :lte]
+  
+  # e.g. find graduations where the student failed 5 classes
+  # /graduations?transcript[failed_classes]=5
+  has_scope :number_failed_classes, as: [:transcript, :failed_classes]
+  
+  # e.g. find graduations where recipient's first name is 'Kelly'
+  # /graduations?recipient[first_name]=Kelly
+  has_scope :recipient_first_name, as: [:recipient, :first_name]
+end
+```
+
+Note that the following are equivalent:
+```ruby
+# These are all equivalent:
+has_scope :president, in: [:degree_info, :college]
+has_scope :president, in: [:degree_info, :college], as: [:president]
+has_scope :president, as: [:degree_info, :college], using: [:president]
+has_scope :president, as: [:degree_info, :college, :president]
 ```
 
 ## Keyword arguments
