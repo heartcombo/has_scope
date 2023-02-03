@@ -1,7 +1,6 @@
 ## HasScope
 
 [![Gem Version](https://fury-badge.herokuapp.com/rb/has_scope.svg)](http://badge.fury.io/rb/has_scope)
-[![Code Climate](https://codeclimate.com/github/heartcombo/has_scope.svg)](https://codeclimate.com/github/heartcombo/has_scope)
 
 _HasScope_ allows you to dynamically apply named scopes to your resources based on an incoming set of parameters.
 
