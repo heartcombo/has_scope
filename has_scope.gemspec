@@ -20,7 +20,6 @@ Gem::Specification.new do |s|
   }
 
   s.files         = Dir['MIT-LICENSE', 'README.md', 'lib/**/*']
-  s.test_files    = Dir['test/**/*.rb']
   s.require_paths = ['lib']
 
   s.rdoc_options = ['--charset=UTF-8']

@@ -1,6 +1,7 @@
 ## Unreleased
 
 * Add support for Rails 7.0 and Ruby 3.1/3.2 (no changes required)
+* Remove test files from the gem package.
 
 ## 0.8.0
 
