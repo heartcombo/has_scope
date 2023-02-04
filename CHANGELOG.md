@@ -2,6 +2,7 @@
 
 * Add support for Rails 7.0 and Ruby 3.1/3.2 (no changes required)
 * Remove test files from the gem package.
+* Expand readme with information on how to use the library outside of controllers.
 
 ## 0.8.0
 
