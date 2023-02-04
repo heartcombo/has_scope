@@ -14,7 +14,7 @@ Gem::Specification.new do |s|
   s.license     = 'MIT'
   s.metadata    = {
     "homepage_uri"    => "https://github.com/heartcombo/has_scope",
-    "changelog_uri"   => "https://github.com/heartcombo/has_scope/blob/master/CHANGELOG.md",
+    "changelog_uri"   => "https://github.com/heartcombo/has_scope/blob/main/CHANGELOG.md",
     "source_code_uri" => "https://github.com/heartcombo/has_scope",
     "bug_tracker_uri" => "https://github.com/heartcombo/has_scope/issues",
   }
