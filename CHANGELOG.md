@@ -1,4 +1,4 @@
-## Unreleased
+## 0.8.2
 
 * Add support for Rails 7.1. (no changes required.)
 * Add `HasScope.deprecator` to integrate with new application deprecators in Rails 7.1.
