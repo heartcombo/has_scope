@@ -87,8 +87,9 @@ class HasScopeTest < ActionController::TestCase
   tests TreesController
 
   def test_boolean_scope_is_called_when_boolean_param_is_true
-    Tree.expects(:only_tall).with().returns(Tree).in_sequence
-    Tree.expects(:all).returns([mock_tree]).in_sequence
+    tree_sequence = sequence('tree')
+    Tree.expects(:only_tall).with().returns(Tree).in_sequence(tree_sequence)
+    Tree.expects(:all).returns([mock_tree]).in_sequence(tree_sequence)
 
     get :index, params: { only_tall: 'true' }
 
@@ -107,8 +108,9 @@ class HasScopeTest < ActionController::TestCase
   end
 
   def test_boolean_scope_with_allow_blank_is_called_when_boolean_param_is_true
-    Tree.expects(:conifer).with(true).returns(Tree).in_sequence
-    Tree.expects(:all).returns([mock_tree]).in_sequence
+    tree_sequence = sequence('tree')
+    Tree.expects(:conifer).with(true).returns(Tree).in_sequence(tree_sequence)
+    Tree.expects(:all).returns([mock_tree]).in_sequence(tree_sequence)
 
     get :index, params: { conifer: 'true' }
 
@@ -117,8 +119,9 @@ class HasScopeTest < ActionController::TestCase
   end
 
   def test_boolean_scope_with_allow_blank_is_called_when_boolean_param_is_false
-    Tree.expects(:conifer).with(false).returns(Tree).in_sequence
-    Tree.expects(:all).returns([mock_tree]).in_sequence
+    tree_sequence = sequence('tree')
+    Tree.expects(:conifer).with(false).returns(Tree).in_sequence(tree_sequence)
+    Tree.expects(:all).returns([mock_tree]).in_sequence(tree_sequence)
 
     get :index, params: { conifer: 'not_true' }
 
@@ -201,8 +204,9 @@ class HasScopeTest < ActionController::TestCase
   end
 
   def test_scope_is_called_with_arguments
-    Tree.expects(:color).with('blue').returns(Tree).in_sequence
-    Tree.expects(:all).returns([mock_tree]).in_sequence
+    tree_sequence = sequence('tree')
+    Tree.expects(:color).with('blue').returns(Tree).in_sequence(tree_sequence)
+    Tree.expects(:all).returns([mock_tree]).in_sequence(tree_sequence)
 
     get :index, params: { color: 'blue' }
 
@@ -211,8 +215,9 @@ class HasScopeTest < ActionController::TestCase
   end
 
   def test_scope_is_not_called_if_blank
+    tree_sequence = sequence('tree')
     Tree.expects(:color).never
-    Tree.expects(:all).returns([mock_tree]).in_sequence
+    Tree.expects(:all).returns([mock_tree]).in_sequence(tree_sequence)
 
     get :index, params: { color: '' }
 
@@ -221,8 +226,9 @@ class HasScopeTest < ActionController::TestCase
   end
 
   def test_scope_is_called_when_blank_if_allow_blank_is_given
+    tree_sequence = sequence('tree')
     Tree.expects(:root_type).with('').returns(Tree)
-    Tree.expects(:all).returns([mock_tree]).in_sequence
+    Tree.expects(:all).returns([mock_tree]).in_sequence(tree_sequence)
 
     get :index, params: { root: '' }
 
@@ -349,11 +355,12 @@ class HasScopeTest < ActionController::TestCase
   end
 
   def test_scope_is_called_with_default_value
-    Tree.expects(:shadown_range).with(10).returns(Tree).in_sequence
-    Tree.expects(:paginate_default).with('page' => 1, 'per_page' => 10).returns(Tree).in_sequence
-    Tree.expects(:args_paginate_default).with(1, 10).returns(Tree).in_sequence
-    Tree.expects(:metadata_default).with('default').returns(Tree).in_sequence
-    Tree.expects(:find).with('42').returns(mock_tree).in_sequence
+    tree_sequence = sequence('tree')
+    Tree.expects(:shadown_range).with(10).returns(Tree).in_sequence(tree_sequence)
+    Tree.expects(:paginate_default).with({ 'page' => 1, 'per_page' => 10 }).returns(Tree).in_sequence(tree_sequence)
+    Tree.expects(:args_paginate_default).with(1, 10).returns(Tree).in_sequence(tree_sequence)
+    Tree.expects(:metadata_default).with('default').returns(Tree).in_sequence(tree_sequence)
+    Tree.expects(:find).with('42').returns(mock_tree).in_sequence(tree_sequence)
 
     get :edit, params: { id: '42' }
 
@@ -367,12 +374,13 @@ class HasScopeTest < ActionController::TestCase
   end
 
   def test_default_scope_value_can_be_overwritten
-    Tree.expects(:shadown_range).with('20').returns(Tree).in_sequence
-    Tree.expects(:paginate_default).with('page' => '2', 'per_page' => '20').returns(Tree).in_sequence
-    Tree.expects(:args_paginate_default).with('3', '15').returns(Tree).in_sequence
-    Tree.expects(:metadata_blank).with(nil).returns(Tree).in_sequence
-    Tree.expects(:metadata_default).with('other').returns(Tree).in_sequence
-    Tree.expects(:find).with('42').returns(mock_tree).in_sequence
+    tree_sequence = sequence('tree')
+    Tree.expects(:shadown_range).with('20').returns(Tree).in_sequence(tree_sequence)
+    Tree.expects(:paginate_default).with({ 'page' => '2', 'per_page' => '20' }).returns(Tree).in_sequence(tree_sequence)
+    Tree.expects(:args_paginate_default).with('3', '15').returns(Tree).in_sequence(tree_sequence)
+    Tree.expects(:metadata_blank).with(nil).returns(Tree).in_sequence(tree_sequence)
+    Tree.expects(:metadata_default).with('other').returns(Tree).in_sequence(tree_sequence)
+    Tree.expects(:find).with('42').returns(mock_tree).in_sequence(tree_sequence)
 
     get :edit, params: {
       id: '42',
@@ -392,8 +400,9 @@ class HasScopeTest < ActionController::TestCase
   end
 
   def test_scope_with_different_key
-    Tree.expects(:root_type).with('outside').returns(Tree).in_sequence
-    Tree.expects(:find).with('42').returns(mock_tree).in_sequence
+    tree_sequence = sequence('tree')
+    Tree.expects(:root_type).with('outside').returns(Tree).in_sequence(tree_sequence)
+    Tree.expects(:find).with('42').returns(mock_tree).in_sequence(tree_sequence)
 
     get :show, params: { id: '42', root: 'outside' }
 
@@ -414,8 +423,9 @@ class HasScopeTest < ActionController::TestCase
 
   def test_scope_with_default_value_as_proc_with_argument
     session[:height] = 100
-    Tree.expects(:calculate_height).with(100).returns(Tree).in_sequence
-    Tree.expects(:new).returns(mock_tree).in_sequence
+    tree_sequence = sequence('tree')
+    Tree.expects(:calculate_height).with(100).returns(Tree).in_sequence(tree_sequence)
+    Tree.expects(:new).returns(mock_tree).in_sequence(tree_sequence)
 
     get :new
 
