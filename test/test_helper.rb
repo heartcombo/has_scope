@@ -2,7 +2,7 @@ require 'bundler/setup'
 
 require 'minitest/autorun'
 require 'mocha'
-require 'mocha/mini_test'
+require 'mocha/minitest'
 
 # Configure Rails
 ENV['RAILS_ENV'] = 'test'

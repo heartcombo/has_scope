@@ -11,6 +11,10 @@ module HasScope
     default: [[ String, Numeric ]],
   }
 
+  def self.deprecator
+    @deprecator ||= ActiveSupport::Deprecation.new("1.0", "HasScope")
+  end
+
   def self.included(base)
     base.class_eval do
       extend ClassMethods
@@ -201,7 +205,7 @@ module HasScope
   def applicable?(string_proc_or_symbol, expected) #:nodoc:
     case string_proc_or_symbol
     when String
-      ActiveSupport::Deprecation.warn <<-DEPRECATION.squish
+      HasScope.deprecator.warn <<-DEPRECATION.squish
         [HasScope] Passing a string to determine if the scope should be applied
         is deprecated and it will be removed in a future version of HasScope.
       DEPRECATION
@@ -221,6 +225,8 @@ module HasScope
     @current_scopes ||= {}
   end
 end
+
+require 'has_scope/railtie' if defined?(Rails)
 
 ActiveSupport.on_load :action_controller do
   include HasScope

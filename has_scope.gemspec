@@ -33,5 +33,5 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency 'activesupport', '>= 5.2'
 
   s.add_development_dependency 'rake'
-  s.add_development_dependency 'mocha', '~> 1.0.0'
+  s.add_development_dependency 'mocha'
 end
