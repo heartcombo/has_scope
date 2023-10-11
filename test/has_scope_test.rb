@@ -57,7 +57,7 @@ class TreesController < ApplicationController
       if params[:eval_plant]
         super
       else
-        ActiveSupport::Deprecation.silence { super }
+        HasScope.deprecator.silence { super }
       end
     end
 
@@ -175,7 +175,7 @@ class HasScopeTest < ActionController::TestCase
     Tree.expects(:eval_plant).with('value').returns(Tree)
     Tree.expects(:all).returns([mock_tree])
 
-    assert_deprecated(/Passing a string to determine if the scope should be applied is deprecated/) do
+    assert_deprecated(/Passing a string to determine if the scope should be applied is deprecated/, HasScope.deprecator) do
       get :index, params: { eval_plant: 'value', skip_eval_plant: nil }
     end
 
