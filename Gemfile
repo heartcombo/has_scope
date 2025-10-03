@@ -1,6 +1,6 @@
-source 'https://rubygems.org'
+source "https://rubygems.org"
 
 gemspec
 
-gem "actionpack", "~> 7.1.0"
-gem "activesupport", "~> 7.1.0"
+gem "actionpack", "~> 8.1.0.beta1"
+gem "activesupport", "~> 8.1.0.beta1"

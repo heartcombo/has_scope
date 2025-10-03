@@ -1,6 +1,6 @@
 source "https://rubygems.org"
 
-gem 'actionpack', github: 'rails/rails', branch: 'main'
-gem 'activesupport', github: 'rails/rails', branch: 'main'
+gemspec path: ".."
 
-gemspec path: "../"
+gem "actionpack", github: "rails/rails", branch: "main"
+gem "activesupport", github: "rails/rails", branch: "main"
