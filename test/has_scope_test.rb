@@ -76,6 +76,9 @@ end
 
 class BonsaisController < TreesController
   has_scope :categories, if: :categories?
+  has_scope :content do |controller, scope|
+    scope.by_content('some other content')
+  end
 
   protected
     def categories?
@@ -481,6 +484,11 @@ class HasScopeTest < ActionController::TestCase
   def test_overwritten_scope
     assert_nil(TreesController.scopes_configuration[:categories][:if])
     assert_equal(:categories?, BonsaisController.scopes_configuration[:categories][:if])
+  end
+
+  def test_overwritten_scope_with_block
+    assert_nil(TreesController.scopes_configuration[:content][:block])
+    assert(BonsaisController.scopes_configuration[:content][:block])
   end
 
   protected

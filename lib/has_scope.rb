@@ -96,6 +96,7 @@ module HasScope
 
       options[:only]   = Array(options[:only])
       options[:except] = Array(options[:except])
+      options[:block] = block if block
 
       self.scopes_configuration = scopes_configuration.dup
 
