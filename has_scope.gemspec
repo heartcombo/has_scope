@@ -8,7 +8,7 @@ Gem::Specification.new do |s|
   s.platform    = Gem::Platform::RUBY
   s.summary     = 'Maps controller filters to your resource scopes.'
   s.email       = 'heartcombo.oss@gmail.com'
-  s.homepage    = 'http://github.com/heartcombo/has_scope'
+  s.homepage    = 'https://github.com/heartcombo/has_scope'
   s.description = 'Maps controller filters to your resource scopes'
   s.authors     = ['José Valim']
   s.license     = 'MIT'
