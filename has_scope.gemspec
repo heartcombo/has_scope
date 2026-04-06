@@ -7,8 +7,8 @@ Gem::Specification.new do |s|
   s.version     = HasScope::VERSION.dup
   s.platform    = Gem::Platform::RUBY
   s.summary     = 'Maps controller filters to your resource scopes.'
-  s.email       = 'opensource@plataformatec.com.br'
-  s.homepage    = 'http://github.com/plataformatec/has_scope'
+  s.email       = 'heartcombo.oss@gmail.com'
+  s.homepage    = 'https://github.com/heartcombo/has_scope'
   s.description = 'Maps controller filters to your resource scopes'
   s.authors     = ['José Valim']
   s.license     = 'MIT'
@@ -27,11 +27,12 @@ Gem::Specification.new do |s|
     'README.md'
   ]
 
-  s.required_ruby_version = '>= 2.5.0'
+  s.required_ruby_version = '>= 2.7.0'
 
-  s.add_runtime_dependency 'actionpack', '>= 5.2'
-  s.add_runtime_dependency 'activesupport', '>= 5.2'
+  s.add_runtime_dependency 'actionpack', '>= 7.0'
+  s.add_runtime_dependency 'activesupport', '>= 7.0'
 
   s.add_development_dependency 'rake'
+  s.add_development_dependency 'rdoc'
   s.add_development_dependency 'mocha'
 end
