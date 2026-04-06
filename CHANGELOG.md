@@ -1,5 +1,6 @@
 ## Unreleased
 
+* Support overwriting scope blocks (#126)
 * Ruby 4.0 support (no changes required)
 
 ## 0.9.0
