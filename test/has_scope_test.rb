@@ -76,6 +76,9 @@ end
 
 class BonsaisController < TreesController
   has_scope :categories, if: :categories?
+  has_scope :content do |controller, scope|
+    scope.by_content('some other content')
+  end
 
   protected
     def categories?
@@ -478,11 +481,6 @@ class HasScopeTest < ActionController::TestCase
     assert_equal({ q: hash }, current_scopes)
   end
 
-  def test_overwritten_scope
-    assert_nil(TreesController.scopes_configuration[:categories][:if])
-    assert_equal(:categories?, BonsaisController.scopes_configuration[:categories][:if])
-  end
-
   protected
 
     def mock_tree(stubs = {})
@@ -491,6 +489,38 @@ class HasScopeTest < ActionController::TestCase
 
     def current_scopes
       @controller.send :current_scopes
+    end
+
+    def assigns(ivar)
+      @controller.instance_variable_get(ivar)
+    end
+end
+
+class HasScopeOverridesTest < ActionController::TestCase
+  tests BonsaisController
+
+  def test_overwritten_scopes_configuration
+    assert_nil(TreesController.scopes_configuration[:categories][:if])
+    assert_equal(:categories?, BonsaisController.scopes_configuration[:categories][:if])
+
+    assert_nil(TreesController.scopes_configuration[:content][:block])
+    assert(BonsaisController.scopes_configuration[:content][:block])
+  end
+
+  def test_overwritten_scope_block_is_called
+    Tree.expects(:by_content).with('some other content').returns(Tree)
+    Tree.expects(:metadata_blank).with(nil).returns(Tree)
+    Tree.expects(:all).returns([mock_tree])
+
+    get :index, params: { q: { content: 'the-content' } }
+
+    assert_equal([mock_tree], assigns(:@trees))
+  end
+
+  protected
+
+    def mock_tree(stubs = {})
+      @mock_tree ||= mock(stubs)
     end
 
     def assigns(ivar)
