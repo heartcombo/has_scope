@@ -186,6 +186,7 @@ end
   except if type `:hash` or `:array` are set.
   Symbols are never permitted to prevent memory leaks, so ensure any routing
   constraints you have that add parameters use string values.
+  You can also register your own types, see [Custom types](#custom-types).
 
 * `:only` - In which actions the scope is applied.
 
@@ -226,6 +227,37 @@ _Note_: it is not possible to apply a boolean scope with just the query param be
 `?active`, that's not considered a "true" value (the param value will be `nil`), and thus the
 scope will be called with `false` as argument. In order for the scope to receive a `true` argument
 the param value must be set to one of the "true" values above, e.g. `?active=true` or `?active=1`.
+
+## Custom types
+
+Besides the built-in types (`:default`, `:boolean`, `:array` and `:hash`), you can register your
+own in `HasScope::ALLOWED_TYPES`, for example in an initializer. Each type maps to a pair:
+
+- The classes the parameter value is allowed to be. Any other value is ignored.
+- An optional parser that receives the value and returns what is passed to the scope.
+
+```ruby
+# config/initializers/has_scope.rb
+HasScope::ALLOWED_TYPES[:date] = [[String], ->(value) { Date.parse(value) rescue nil }]
+```
+
+```ruby
+has_scope :planted_after, type: :date
+
+# and models with
+scope :planted_after, ->(date) { where("planted_at > ?", date) }
+```
+
+```ruby
+# GET /trees?planted_after=2014-11-11
+#=> calls Tree.planted_after(Date.new(2014, 11, 11))
+
+# GET /trees?planted_after=invalid
+#=> the parser returns nil, so the scope is not applied
+```
+
+As with any other type, a blank result skips the scope unless `allow_blank: true` is set, so a
+parser can return `nil` to ignore values it cannot handle.
 
 ## Block usage
 
